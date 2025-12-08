@@ -241,7 +241,7 @@
       gap:7px;
       background:#0f1218;
       color:var(--text);
-      transition:background .18s, filter .18s, transform .1s;
+      transition:background .18s, filter .18s, transform .1s, opacity .15s;
     }
     .btn:hover{
       background:#161a22;
@@ -270,6 +270,13 @@
       background:linear-gradient(180deg,#ef4444,#b91c1c);
       border-color:#b91c1c;
       color:#fee2e2;
+    }
+
+    /* NEW: disabled button visual */
+    .btn[disabled]{
+      opacity:0.55;
+      cursor:not-allowed;
+      pointer-events:none;
     }
 
     .pill{
@@ -852,11 +859,22 @@ Items: - SKU001; LED Light; Qty 100; Rate 25.50"
 
       <!-- Action Buttons -->
       <div class="card fade-in">
-        <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;">
+        <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:center;">
           <button type="button" class="btn btn-primary" style="padding:10px 26px;font-size:14px;" id="generateBtn">
             <i class="fas fa-file-pdf"></i>
             Generate Invoice
           </button>
+
+          <!-- NEW: generate loading pill -->
+          <span
+            id="generateStatus"
+            class="pill"
+            style="display:none; align-items:center; gap:6px;"
+          >
+            <i class="fas fa-circle-notch fa-spin"></i>
+            Generating…
+          </span>
+
           <button type="button" class="btn btn-success" style="padding:10px 26px;font-size:14px;" id="saveTemplateBtn" title="Saves/updates template for current company">
             <i class="fas fa-save"></i>
             Save Template
@@ -1127,7 +1145,19 @@ async function saveTemplate() {
 
 async function generateInvoice() {
   const payload = collectForm();
+  const btn = $('generateBtn');
+  const status = $('generateStatus');
+
   try {
+    // turn ON loading state
+    if (btn) {
+      btn.disabled = true;
+    }
+    if (status) {
+      status.style.display = 'inline-flex';
+      status.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating…';
+    }
+
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -1142,6 +1172,14 @@ async function generateInvoice() {
     await loadCompanies();
   } catch (e) {
     showResult('Error generating invoice: ' + e.message);
+  } finally {
+    // turn OFF loading state
+    if (btn) {
+      btn.disabled = false;
+    }
+    if (status) {
+      status.style.display = 'none';
+    }
   }
 }
 
