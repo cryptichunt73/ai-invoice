@@ -1,0 +1,932 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Invoice Generator Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --panel:#14161a;
+      --panel2:#171a1f;
+      --text:#e8ebf0;
+      --muted:#aab3c0;
+      --primary:#4f8cff;
+      --border:#262a31;
+      --radius:14px;
+      --radiusSm:10px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --ok:#1dd89a;
+      --warn:#facc15;
+      --danger:#ef4444;
+    }
+
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #1d2331 0%, transparent 50%),
+        radial-gradient(1200px 600px at 110% -20%, #1a2336 0%, transparent 45%),
+        var(--bg);
+      color:var(--text);
+      font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    .container{max-width:1180px;margin:32px auto 120px;padding:0 20px;}
+
+    .hero{
+      background: linear-gradient(180deg,#151823,#10131c);
+      border-radius:22px;border:1px solid rgba(120,140,200,.35);
+      box-shadow:var(--shadow);
+      padding:22px;
+      display:flex;justify-content:space-between;align-items:center;gap:16px;
+    }
+    .hero h1{margin:0;font-size:26px;font-weight:800;letter-spacing:.4px;}
+    .hero p{margin:6px 0 0;color:#cbd5f5;font-size:13px;}
+
+    .pill{
+      font-size:11px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid #233a75;
+      background:#1a2950;
+      color:#bfdbfe;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+    }
+
+    .card{
+      background:linear-gradient(180deg,var(--panel),var(--panel2));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-top:18px;
+    }
+    .card-header{
+      border-bottom:1px solid var(--border);
+      padding-bottom:10px;
+      margin-bottom:14px;
+    }
+    .section-title{
+      margin:0;
+      font-size:15px;
+      text-transform:uppercase;
+      letter-spacing:.35px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .section-sub{
+      margin:6px 0 0;
+      font-size:12.5px;
+      color:var(--muted);
+    }
+
+    label.label{
+      font-size:12.5px;
+      color:var(--muted);
+      letter-spacing:.35px;
+      margin:6px 0 4px;
+      display:block;
+    }
+
+    .input, textarea, select{
+      width:100%;
+      box-sizing:border-box;
+      background:#101319;
+      color:var(--text);
+      border:1px solid var(--border);
+      outline:none;
+      padding:9px 11px;
+      border-radius:var(--radiusSm);
+      font-size:13px;
+    }
+    textarea{min-height:92px;resize:vertical;}
+
+    .grid2{display:grid;gap:16px;grid-template-columns:1fr 1fr;}
+    .grid3{display:grid;gap:16px;grid-template-columns:1.2fr 1fr 1fr;}
+    @media(max-width:980px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+    .btn{
+      cursor:pointer;
+      border-radius:999px;
+      border:1px solid var(--border);
+      padding:8px 14px;
+      font-size:13px;
+      font-weight:700;
+      background:#0f1218;
+      color:var(--text);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    .btn:hover{background:#161a22;}
+    .btn-primary{
+      background:linear-gradient(180deg,var(--primary),#3a73df);
+      border-color:#2c56c5;
+      color:#fff;
+    }
+    .btn-success{
+      background:linear-gradient(180deg,#1dd89a,#0f9c68);
+      border-color:#089767;
+      color:#f0fdf4;
+    }
+    .btn-danger{
+      background:linear-gradient(180deg,#ef4444,#b91c1c);
+      border-color:#b91c1c;
+      color:#fee2e2;
+    }
+    .btn-warning{
+      background:linear-gradient(180deg,#facc15,#eab308);
+      border-color:#eab308;
+      color:#111827;
+    }
+
+    .item-row{
+      background:#101319;
+      border:1px solid var(--border);
+      border-radius:var(--radiusSm);
+      padding:12px;
+      margin-bottom:10px;
+    }
+    .item-grid{
+      display:grid;
+      gap:10px;
+      grid-template-columns:.55fr 1.1fr 2.1fr .7fr .7fr .9fr 1fr;
+    }
+    @media(max-width:980px){
+      .item-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+    }
+    .item-footer{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:10px;
+      padding-top:8px;
+      border-top:1px solid var(--border);
+    }
+
+    .divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+
+    .notice{
+      font-size:12.5px;
+      color:var(--muted);
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+
+    .statusBox{
+      margin-top:12px;
+      border-radius:12px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      background:#0f1218;
+      white-space:pre-wrap;
+      display:none;
+    }
+    .statusBox.ok{border-color: rgba(29,216,154,.35);}
+    .statusBox.err{border-color: rgba(239,68,68,.35);}
+    .statusBox a{color:#93c5fd;text-decoration:underline;}
+
+    iframe{
+      width:100%;
+      height:920px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:#fff;
+    }
+
+    .hint {
+      font-size:12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="hero">
+      <div>
+        <h1><i class="fa-solid fa-file-invoice"></i> Invoice Generator Pro</h1>
+        <p>Fill the form → Generate Invoice. Buyer/Notify dropdowns from Notion + auto address. Amount-in-words auto from total.</p>
+      </div>
+      <div style="text-align:right;">
+        <div class="pill"><i class="fa-solid fa-lock"></i> Templates saved on server</div>
+        <div style="margin-top:8px;color:#a5b4fc;font-size:12px;">“American-style” UX + print CSS enforced</div>
+      </div>
+    </div>
+
+    <!-- GEMINI AI PRODUCT BUILDER -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Gemini AI Product Builder</h2>
+        <p class="section-sub">Enter company + origin + target amount → AI suggests products, quantities, and market pricing to hit your total.</p>
+      </div>
+
+      <div class="grid3">
+        <div>
+          <label class="label">Company Name</label>
+          <input id="ai_company" class="input" placeholder="Example: Apple, Nike, Philips, IKEA" />
+        </div>
+        <div>
+          <label class="label">Company Origin / Region</label>
+          <input id="ai_origin" class="input" placeholder="Example: USA / China / Germany / India" />
+        </div>
+        <div>
+          <label class="label">Target Amount</label>
+          <input id="ai_amount" class="input" placeholder="Example: 25000" />
+          <div class="hint">Tip: use numbers only (no commas).</div>
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-top:12px;">
+        <div>
+          <label class="label">Currency</label>
+          <select id="ai_currency" class="input">
+            <option value="USD" selected>USD ($) — United States</option>
+            <option value="INR">INR (₹) — India</option>
+            <option value="EUR">EUR (€) — Eurozone</option>
+            <option value="GBP">GBP (£) — United Kingdom</option>
+            <option value="AED">AED (د.إ) — UAE</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Notes (optional)</label>
+          <input id="ai_notes" class="input" placeholder="Example: prefer 3-6 items, realistic products, include SKUs if possible" />
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; align-items:center;">
+        <button class="btn btn-primary" type="button" id="aiSuggestBtn">
+          <i class="fa-solid fa-robot"></i> Suggest Items into Invoice
+        </button>
+        <div class="small">
+          This calls <code>/api/ai/suggest_items</code> and will overwrite the current Items list.
+        </div>
+      </div>
+
+      <div id="aiBox" class="statusBox ok"></div>
+      <div id="aiErr" class="statusBox err"></div>
+    </div>
+
+    <!-- FORM -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="section-title"><i class="fa-solid fa-pen-to-square"></i> Invoice Form</h2>
+        <p class="section-sub">Company, buyer/notify, items, totals, bank details.</p>
+      </div>
+
+      <div class="grid2">
+        <!-- LEFT -->
+        <div>
+          <h3 class="section-title" style="margin:0 0 8px 0;"><i class="fa-solid fa-building"></i> Company & Invoice</h3>
+
+          <label class="label">Company Name</label>
+          <input id="company_name" class="input" placeholder="Clair Electronics Pvt Ltd" placeholder="Demo Company Pvt Ltd"/>
+
+          <label class="label">Company Address</label>
+          <textarea id="company_address" class="input" placeholder="500 Demo Street, City"></textarea>
+
+          <div class="grid2" style="margin-top:12px;">
+            <div>
+              <label class="label">Invoice Title</label>
+              <input id="invoice_title" class="input" placeholder="PROFORMA INVOICE"/>
+            </div>
+            <div>
+              <label class="label">PI Number</label>
+              <input id="invoice_number" class="input" placeholder="PI-2025-0001"/>
+            </div>
+          </div>
+
+          <div class="grid2" style="margin-top:12px;">
+            <div>
+              <label class="label">Date (YYYY-MM-DD)</label>
+              <input id="invoice_date" class="input" placeholder="2025-01-04"/>
+              <div class="hint">US style is fine; your template decides display formatting.</div>
+            </div>
+            <div>
+              <label class="label">Logistics Party Delivery at Address</label>
+              <input id="shipment_method" class="input" placeholder="VIA SEA"/>
+            </div>
+          </div>
+
+          <div class="grid2" style="margin-top:12px;">
+            <div>
+              <label class="label">Place of Loading</label>
+              <input id="port_loading" class="input" placeholder="CHINA"/>
+            </div>
+            <div>
+              <label class="label">Place of Discharge</label>
+              <input id="port_discharge" class="input" placeholder="CHENNAI, INDIA"/>
+            </div>
+          </div>
+
+          <hr class="divider"/>
+
+          <h3 class="section-title" style="margin:0 0 8px 0;"><i class="fa-solid fa-users"></i> Buyer & Notify</h3>
+
+          <!-- BUYER -->
+          <label class="label">Buyer (from Notion)</label>
+          <select id="buyer_pick" class="input"></select>
+          <div class="hint">Selecting a buyer auto-fills Buyer Name + Buyer Address.</div>
+
+          <label class="label">Buyer Name</label>
+          <input id="buyer_name" class="input" placeholder="Buyer Company"/>
+
+          <label class="label">Buyer Address</label>
+          <textarea id="buyer_address" class="input"></textarea>
+
+          <hr class="divider"/>
+
+          <!-- NOTIFY -->
+          <label class="label">Notify Party (from Notion)</label>
+          <select id="notify_pick" class="input"></select>
+          <div class="hint">Selecting a notify party auto-fills Notify Name + Notify Address.</div>
+
+          <label class="label">Notify Name</label>
+          <input id="notify_name" class="input" placeholder="Notify Company"/>
+
+          <label class="label">Notify Address</label>
+          <textarea id="notify_address" class="input"></textarea>
+
+          <hr class="divider"/>
+
+          <label class="label">Category</label>
+          <input id="category" class="input" placeholder="LED LIGHTING FIXTURES AND SPARES"/>
+        </div>
+
+        <!-- RIGHT -->
+        <div>
+          <h3 class="section-title" style="margin:0 0 8px 0;"><i class="fa-solid fa-list"></i> Items</h3>
+          <div class="notice"><i class="fa-solid fa-circle-info"></i> Amount auto-calculates as qty × rate.</div>
+
+          <div id="itemsWrap" style="margin-top:12px;"></div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+            <button class="btn btn-primary" type="button" id="addItemBtn"><i class="fa-solid fa-plus"></i> Add Item</button>
+            <button class="btn" type="button" id="recalcBtn"><i class="fa-solid fa-calculator"></i> Recalculate</button>
+          </div>
+
+          <hr class="divider"/>
+
+          <h3 class="section-title" style="margin:0 0 8px 0;"><i class="fa-solid fa-receipt"></i> Totals</h3>
+
+          <div class="grid2">
+            <div>
+              <label class="label">Freight</label>
+              <input id="tot_freight" class="input" placeholder="0"/>
+            </div>
+            <div>
+              <label class="label">Insurance</label>
+              <input id="tot_insurance" class="input" placeholder="0"/>
+            </div>
+          </div>
+          <div class="grid2" style="margin-top:12px;">
+            <div>
+              <label class="label">Other</label>
+              <input id="tot_other" class="input" placeholder="0"/>
+            </div>
+            <div>
+              <label class="label">Amount In Words (auto)</label>
+              <input id="amount_words" class="input" placeholder="" readonly/>
+              <div class="hint">Auto from Grand Total (US dollars + cents style).</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <label class="label">Grand Total (auto)</label>
+            <input id="grand_total" class="input" placeholder="0" readonly style="font-size:16px;font-weight:800;"/>
+          </div>
+
+          <hr class="divider"/>
+
+          <h3 class="section-title" style="margin:0 0 8px 0;"><i class="fa-solid fa-building-columns"></i> Bank</h3>
+
+          <label class="label">Bank Name</label>
+          <input id="bank_name" class="input" placeholder="Demo Bank"/>
+
+          <div class="grid2" style="margin-top:12px;">
+            <div>
+              <label class="label">Account Name</label>
+              <input id="account_name" class="input" placeholder="Demo Company Pvt Ltd"/>
+            </div>
+            <div>
+              <label class="label">Account No</label>
+              <input id="account_no" class="input" placeholder="1234567890"/>
+            </div>
+          </div>
+
+          <div class="grid2" style="margin-top:12px;">
+            <div>
+              <label class="label">IFSC</label>
+              <input id="ifsc" class="input" placeholder="DEMO0001234"/>
+            </div>
+            <div>
+              <label class="label">SWIFT</label>
+              <input id="swift" class="input" placeholder=""/>
+            </div>
+          </div>
+
+          <div class="grid2" style="margin-top:12px;">
+            <div>
+              <label class="label">IBAN</label>
+              <input id="iban" class="input" placeholder=""/>
+            </div>
+            <div>
+              <label class="label">Routing</label>
+              <input id="routing" class="input" placeholder=""/>
+            </div>
+          </div>
+
+          <label class="label" style="margin-top:12px;">Branch</label>
+          <input id="branch" class="input" placeholder="Main Branch"/>
+
+          <hr class="divider"/>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+            <button class="btn btn-primary" type="button" id="generateBtn">
+              <i class="fa-solid fa-file-lines"></i> Generate Invoice
+            </button>
+            <button class="btn btn-warning" type="button" id="resetPreviewBtn">
+              <i class="fa-solid fa-eye-slash"></i> Clear Preview
+            </button>
+          </div>
+
+          <div id="okBox" class="statusBox ok"></div>
+          <div id="errorBox" class="statusBox err"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="section-title"><i class="fa-solid fa-display"></i> Preview</h2>
+        <p class="section-sub">This is the rendered invoice HTML coming back from /api/generate.</p>
+      </div>
+      <iframe id="preview"></iframe>
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+
+    const $ = (id) => document.getElementById(id);
+
+    function escHtml(s) {
+      return String(s ?? "").replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    // -----------------------------
+    // Number -> Words (US English)
+    // -----------------------------
+    const SMALL = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+    const TENS  = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+
+    function chunkToWords(n) {
+      n = Number(n) || 0;
+      let out = [];
+      if (n >= 100) {
+        out.push(SMALL[Math.floor(n/100)], "hundred");
+        n = n % 100;
+      }
+      if (n >= 20) {
+        out.push(TENS[Math.floor(n/10)]);
+        n = n % 10;
+        if (n) out[out.length-1] += "-" + SMALL[n];
+      } else if (n > 0) {
+        out.push(SMALL[n]);
+      } else if (out.length === 0) {
+        out.push("zero");
+      }
+      return out.join(" ");
+    }
+
+    function numberToWordsUS(num) {
+      num = Math.floor(Number(num) || 0);
+      if (num === 0) return "zero";
+      const units = [
+        {v: 1_000_000_000, name:"billion"},
+        {v: 1_000_000, name:"million"},
+        {v: 1_000, name:"thousand"},
+        {v: 1, name:""}
+      ];
+      let parts = [];
+      for (const u of units) {
+        if (num >= u.v) {
+          const chunk = Math.floor(num / u.v);
+          num = num % u.v;
+          if (chunk) {
+            parts.push(chunkToWords(chunk) + (u.name ? " " + u.name : ""));
+          }
+        }
+      }
+      return parts.join(" ");
+    }
+
+    function moneyToWordsUSD(amount) {
+      const n = Number(amount || 0);
+      const dollars = Math.floor(n);
+      const cents = Math.round((n - dollars) * 100);
+
+      const dWords = numberToWordsUS(dollars);
+      const cWords = numberToWordsUS(cents);
+
+      const dLabel = dollars === 1 ? "dollar" : "dollars";
+      const cLabel = cents === 1 ? "cent" : "cents";
+
+      return (capitalize(dWords) + ` ${dLabel} and ` + `${cWords} ${cLabel} only`).replace(/\s+/g," ").trim();
+    }
+
+    function capitalize(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+
+    // -------- Items UI ----------
+    let items = [
+      { sl_no: 1, item_no: "SKU-0001", description: "Product Description", qty: 10, unit: "PCS", rate: 12.50, amount: 125.00 }
+    ];
+
+    function itemRowHTML(it, idx) {
+      return `
+        <div class="item-row" data-idx="${idx}">
+          <div class="item-grid">
+            <div>
+              <label class="label" style="font-size:11px;">SL.NO</label>
+              <input class="input it-sl" value="${escHtml(it.sl_no)}" />
+            </div>
+            <div>
+              <label class="label" style="font-size:11px;">ITEM NO.</label>
+              <input class="input it-itemno" value="${escHtml(it.item_no)}" />
+            </div>
+            <div>
+              <label class="label" style="font-size:11px;">DESCRIPTION</label>
+              <input class="input it-desc" value="${escHtml(it.description)}" />
+            </div>
+            <div>
+              <label class="label" style="font-size:11px;">QTY</label>
+              <input class="input it-qty" style="text-align:center;" value="${escHtml(it.qty)}" />
+            </div>
+            <div>
+              <label class="label" style="font-size:11px;">UNIT</label>
+              <input class="input it-unit" style="text-align:center;" value="${escHtml(it.unit)}" />
+            </div>
+            <div>
+              <label class="label" style="font-size:11px;">RATE</label>
+              <input class="input it-rate" style="text-align:right;" value="${escHtml(it.rate)}" />
+            </div>
+            <div>
+              <label class="label" style="font-size:11px;">AMOUNT</label>
+              <input class="input it-amount" style="text-align:right;font-weight:800;" value="${escHtml(it.amount)}" readonly />
+            </div>
+          </div>
+          <div class="item-footer">
+            <button type="button" class="btn btn-danger btn-sm removeItemBtn">
+              <i class="fa-solid fa-trash"></i> Remove
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderItems() {
+      const wrap = $("itemsWrap");
+      wrap.innerHTML = items.map((it, idx) => itemRowHTML(it, idx)).join("");
+
+      wrap.querySelectorAll(".item-row").forEach(row => {
+        const idx = Number(row.getAttribute("data-idx"));
+        const get = (sel) => row.querySelector(sel);
+
+        const sync = () => {
+          items[idx].sl_no = Number(get(".it-sl").value || (idx+1));
+          items[idx].item_no = get(".it-itemno").value || "";
+          items[idx].description = get(".it-desc").value || "";
+          items[idx].qty = Number(get(".it-qty").value || 0);
+          items[idx].unit = get(".it-unit").value || "";
+          items[idx].rate = Number(get(".it-rate").value || 0);
+          recalc();
+        };
+
+        ["input","change"].forEach(evt => {
+          get(".it-sl").addEventListener(evt, sync);
+          get(".it-itemno").addEventListener(evt, sync);
+          get(".it-desc").addEventListener(evt, sync);
+          get(".it-qty").addEventListener(evt, sync);
+          get(".it-unit").addEventListener(evt, sync);
+          get(".it-rate").addEventListener(evt, sync);
+        });
+
+        row.querySelector(".removeItemBtn").addEventListener("click", () => {
+          items.splice(idx, 1);
+          items.forEach((it,i)=> it.sl_no = i+1);
+          renderItems();
+          recalc();
+        });
+      });
+    }
+
+    function addItem() {
+      const sl = items.length + 1;
+      items.push({ sl_no: sl, item_no: "", description: "", qty: 1, unit: "PCS", rate: 0, amount: 0 });
+      renderItems();
+      recalc();
+    }
+
+    function recalc() {
+      let subtotal = 0;
+      items.forEach(it => {
+        it.amount = Number(it.qty || 0) * Number(it.rate || 0);
+        subtotal += it.amount;
+      });
+
+      const wrap = $("itemsWrap");
+      wrap.querySelectorAll(".item-row").forEach(row => {
+        const idx = Number(row.getAttribute("data-idx"));
+        const amt = row.querySelector(".it-amount");
+        if (amt) amt.value = (items[idx].amount || 0).toFixed(2);
+      });
+
+      const freight = Number($("tot_freight").value || 0);
+      const insurance = Number($("tot_insurance").value || 0);
+      const other = Number($("tot_other").value || 0);
+      const grand = subtotal + freight + insurance + other;
+
+      $("grand_total").value = grand.toFixed(2);
+
+      // Amount in words (USD style by default)
+      // If you want to switch based on currency, you can add logic here.
+      $("amount_words").value = moneyToWordsUSD(grand);
+
+      return { subtotal, freight, insurance, other, grand_total: grand };
+    }
+
+    // -------- Status UI ----------
+    function showOk(msg) {
+      $("errorBox").style.display = "none";
+      $("okBox").style.display = "block";
+      $("okBox").textContent = msg;
+    }
+    function showError(msg) {
+      $("okBox").style.display = "none";
+      $("errorBox").style.display = "block";
+      $("errorBox").textContent = msg;
+    }
+
+    function showAiOk(msg) {
+      $("aiErr").style.display = "none";
+      $("aiBox").style.display = "block";
+      $("aiBox").textContent = msg;
+    }
+    function showAiErr(msg) {
+      $("aiBox").style.display = "none";
+      $("aiErr").style.display = "block";
+      $("aiErr").textContent = msg;
+    }
+
+    // -------- Payload (matches the Flask app.py schema) ----------
+    function buildPayload() {
+      const totalsCalc = recalc();
+      return {
+        company: {
+          name: $("company_name").value,
+          address: $("company_address").value
+        },
+        invoice: {
+          title: $("invoice_title").value,
+          number: $("invoice_number").value,
+          date: $("invoice_date").value,
+          shipment_method: $("shipment_method").value,
+          port_loading: $("port_loading").value,
+          port_discharge: $("port_discharge").value
+        },
+        buyer: {
+          name: $("buyer_name").value,
+          address: $("buyer_address").value
+        },
+        notify: {
+          name: $("notify_name").value,
+          address: $("notify_address").value
+        },
+        category: $("category").value,
+        items: items,
+        totals: {
+          subtotal: totalsCalc.subtotal,
+          freight: totalsCalc.freight,
+          insurance: totalsCalc.insurance,
+          other: totalsCalc.other,
+          grand_total: totalsCalc.grand_total,
+          amount_in_words: $("amount_words").value
+        },
+        bank: {
+          bank_name: $("bank_name").value,
+          account_name: $("account_name").value,
+          account_no: $("account_no").value,
+          ifsc: $("ifsc").value,
+          swift: $("swift").value,
+          iban: $("iban").value,
+          routing: $("routing").value,
+          branch: $("branch").value
+        }
+      };
+    }
+
+    async function generateInvoice() {
+      try {
+        showOk("Generating…");
+        const payload = buildPayload();
+
+        const res = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json().catch(() => null);
+        if (!data) throw new Error("Server returned non-JSON response.");
+
+        if (!data.ok) {
+          const trace = data.trace ? "\n\n--- TRACE ---\n" + data.trace : "";
+          throw new Error((data.error || "Unknown error") + trace);
+        }
+
+        showOk(
+          `✅ OK\ncompany_slug=${data.company_slug}\n` +
+          `template_saved=${data.template_saved}\n` +
+          `archetype_id=${data.archetype_id || "(unknown)"}\n` +
+          (data.debug ? `\n--- debug ---\n${JSON.stringify(data.debug, null, 2)}` : "")
+        );
+
+        const iframe = $("preview");
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(data.rendered_html);
+        doc.close();
+
+      } catch (e) {
+        console.error(e);
+        showError(String(e));
+      }
+    }
+
+    function clearPreview() {
+      const iframe = $("preview");
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write("<!doctype html><html><body style='font-family:Arial;padding:18px;'>Preview cleared.</body></html>");
+      doc.close();
+      $("okBox").style.display = "none";
+      $("errorBox").style.display = "none";
+    }
+
+    // -----------------------------
+    // Notion Party Dropdowns
+    // -----------------------------
+    function normalizePartyItem(x) {
+      if (!x) return null;
+      const name = x.name ?? x.title ?? x.party ?? x["Buyer Party"] ?? x["Notify Party"] ?? "";
+      const address = x.address ?? x.addr ?? x["Buyer Party Address"] ?? x["Notify Party Address"] ?? "";
+      const id = x.id ?? x.page_id ?? x.notion_id ?? name;
+      return { id, name: String(name || "").trim(), address: String(address || "").trim() };
+    }
+
+    async function loadPartyDropdown(kind) {
+      // kind: "buyer" or "notify"
+      const pick = $(kind === "buyer" ? "buyer_pick" : "notify_pick");
+      pick.innerHTML = `<option value="">Loading ${kind} parties…</option>`;
+
+      try {
+        const res = await fetch(`/api/parties/${kind}`);
+        const data = await res.json().catch(() => null);
+        if (!data || !data.ok) throw new Error(data?.error || "Failed to load parties");
+
+        const list = (data.items || []).map(normalizePartyItem).filter(x => x && x.name);
+        const options = [
+          `<option value="">— Select from Notion —</option>`,
+          `<option value="__manual__">Manual entry (type yourself)</option>`,
+          ...list.map(p => `<option value="${escHtml(p.name)}" data-address="${escHtml(p.address)}">${escHtml(p.name)}</option>`)
+        ];
+        pick.innerHTML = options.join("");
+
+        // Auto-fill when selection changes
+        pick.addEventListener("change", () => {
+          const selected = pick.value;
+
+          if (kind === "buyer") {
+            if (selected === "__manual__" || selected === "") return;
+            const opt = pick.options[pick.selectedIndex];
+            $("buyer_name").value = selected;
+            $("buyer_address").value = opt?.dataset?.address || "";
+          } else {
+            if (selected === "__manual__" || selected === "") return;
+            const opt = pick.options[pick.selectedIndex];
+            $("notify_name").value = selected;
+            $("notify_address").value = opt?.dataset?.address || "";
+          }
+        });
+
+        // If nothing found, show a helpful message
+        if (list.length === 0) {
+          pick.innerHTML = [
+            `<option value="">No parties found in Notion</option>`,
+            `<option value="__manual__">Manual entry (type yourself)</option>`
+          ].join("");
+        }
+
+      } catch (e) {
+        console.error(e);
+        pick.innerHTML = `<option value="">Error loading ${kind} parties</option>`;
+      }
+    }
+
+    // -----------------------------
+    // Gemini AI Suggestion -> Items
+    // -----------------------------
+    async function aiSuggestItems() {
+      try {
+        showAiOk("Asking Gemini…");
+        const company = $("ai_company").value.trim();
+        const origin = $("ai_origin").value.trim();
+        const amount = Number($("ai_amount").value || 0);
+        const currency = $("ai_currency").value;
+        const notes = $("ai_notes").value.trim();
+
+        if (!company || !origin || !amount || amount <= 0) {
+          throw new Error("Please fill Company Name, Origin, and a Target Amount > 0.");
+        }
+
+        const res = await fetch("/api/ai/suggest_items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ company, origin, amount, currency, notes })
+        });
+
+        const data = await res.json().catch(() => null);
+        if (!data || !data.ok) throw new Error(data?.error || "AI endpoint returned an error.");
+
+        const newItems = Array.isArray(data.items) ? data.items : [];
+        if (newItems.length === 0) throw new Error("Gemini returned 0 items. Try a larger amount or add notes like “real products”.");
+        
+        // Replace items list
+        items = newItems.map((it, i) => ({
+          sl_no: i + 1,
+          item_no: String(it.item_no ?? it.sku ?? `SKU-${String(i+1).padStart(4,"0")}`),
+          description: String(it.description ?? it.name ?? "Product"),
+          qty: Number(it.qty ?? 1),
+          unit: String(it.unit ?? "PCS"),
+          rate: Number(it.rate ?? it.price ?? 0),
+          amount: 0
+        }));
+
+        $("tot_freight").value = "0";
+        $("tot_insurance").value = "0";
+        $("tot_other").value = "0";
+
+        renderItems();
+        recalc();
+
+        const noteText = data.notes ? `\n\nNotes:\n${data.notes}` : "";
+        showAiOk(`✅ Items inserted into invoice.\nCount: ${items.length}${noteText}`);
+      } catch (e) {
+        console.error(e);
+        showAiErr(String(e));
+      }
+    }
+
+    // -------- init ----------
+    document.addEventListener("DOMContentLoaded", () => {
+      renderItems();
+      recalc();
+
+      $("addItemBtn").addEventListener("click", addItem);
+      $("recalcBtn").addEventListener("click", recalc);
+
+      $("tot_freight").addEventListener("input", recalc);
+      $("tot_insurance").addEventListener("input", recalc);
+      $("tot_other").addEventListener("input", recalc);
+
+      $("generateBtn").addEventListener("click", generateInvoice);
+      $("resetPreviewBtn").addEventListener("click", clearPreview);
+
+      $("aiSuggestBtn").addEventListener("click", aiSuggestItems);
+
+      // Load Notion dropdowns
+      loadPartyDropdown("buyer");
+      loadPartyDropdown("notify");
+
+      clearPreview();
+    });
+  </script>
+</body>
+</html>
