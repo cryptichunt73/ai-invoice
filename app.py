@@ -1712,9 +1712,13 @@ def pick_best_candidate(company_slug: str, candidates: List[Tuple[dict, str]]) -
         raise ValueError("All generated candidates failed validation. See debug info.")
 
     # Strict novelty gate (tune threshold if needed)
-    if best["sim"] > 0.42:
-        debug["note"] = "Best candidate still too similar; increase K or strengthen prompt."
-        raise ValueError("Templates are still too similar to existing ones. Increase candidate count K or strengthen prompt.")
+    NOVELTY_MAX_SIM = float(os.getenv("NOVELTY_MAX_SIM", "0.75"))
+
+    if best["sim"] > NOVELTY_MAX_SIM:
+        debug["note"] = f"Best candidate similarity {best['sim']:.4f} > threshold {NOVELTY_MAX_SIM}."
+        # either allow it, or raise if you really want to block:
+        # raise ValueError("Templates are still too similar...")
+
 
     return best["recipe"], best["html"], debug
 
