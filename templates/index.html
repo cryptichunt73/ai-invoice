@@ -4,6 +4,9 @@
   <meta charset="utf-8"/>
   <title>Invoice Generator Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <!-- NOTE: your app.py template validator disallows external CSS inside invoice templates,
+       but index.html can still use CDNs. If you ever want this fully offline, I can inline icons. -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
   <style>
@@ -212,6 +215,19 @@
       font-size: 12px;
       color: var(--muted);
     }
+
+    /* Download bar */
+    .downloadBar{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:center;
+    }
+    .downloadBar .btn{
+      display:none; /* shown only after successful generate */
+    }
   </style>
 </head>
 
@@ -294,7 +310,7 @@
           <h3 class="section-title" style="margin:0 0 8px 0;"><i class="fa-solid fa-building"></i> Company & Invoice</h3>
 
           <label class="label">Company Name</label>
-          <input id="company_name" class="input" placeholder="Clair Electronics Pvt Ltd" placeholder="Demo Company Pvt Ltd"/>
+          <input id="company_name" class="input" placeholder="Clair Electronics Pvt Ltd"/>
 
           <label class="label">Company Address</label>
           <textarea id="company_address" class="input" placeholder="500 Demo Street, City"></textarea>
@@ -462,6 +478,16 @@
             <button class="btn btn-warning" type="button" id="resetPreviewBtn">
               <i class="fa-solid fa-eye-slash"></i> Clear Preview
             </button>
+          </div>
+
+          <!-- Download buttons (appear after generate) -->
+          <div class="downloadBar">
+            <a id="downloadLink" class="btn btn-success" href="#" target="_blank" rel="noopener">
+              <i class="fa-solid fa-download"></i> Download / Open Invoice
+            </a>
+            <a id="exportLink" class="btn" href="#" target="_blank" rel="noopener">
+              <i class="fa-solid fa-box-archive"></i> Open Export Copy
+            </a>
           </div>
 
           <div id="okBox" class="statusBox ok"></div>
@@ -664,9 +690,6 @@
       const grand = subtotal + freight + insurance + other;
 
       $("grand_total").value = grand.toFixed(2);
-
-      // Amount in words (USD style by default)
-      // If you want to switch based on currency, you can add logic here.
       $("amount_words").value = moneyToWordsUSD(grand);
 
       return { subtotal, freight, insurance, other, grand_total: grand };
@@ -682,6 +705,9 @@
       $("okBox").style.display = "none";
       $("errorBox").style.display = "block";
       $("errorBox").textContent = msg;
+
+      // hide download buttons on error
+      setDownloadLinks(null, null);
     }
 
     function showAiOk(msg) {
@@ -693,6 +719,28 @@
       $("aiBox").style.display = "none";
       $("aiErr").style.display = "block";
       $("aiErr").textContent = msg;
+    }
+
+    // -------- Download links ----------
+    function setDownloadLinks(downloadUrl, exportUrl) {
+      const dl = $("downloadLink");
+      const ex = $("exportLink");
+
+      if (downloadUrl) {
+        dl.href = downloadUrl;
+        dl.style.display = "inline-flex";
+      } else {
+        dl.href = "#";
+        dl.style.display = "none";
+      }
+
+      if (exportUrl) {
+        ex.href = exportUrl;
+        ex.style.display = "inline-flex";
+      } else {
+        ex.href = "#";
+        ex.style.display = "none";
+      }
     }
 
     // -------- Payload (matches the Flask app.py schema) ----------
@@ -745,6 +793,8 @@
     async function generateInvoice() {
       try {
         showOk("Generating…");
+        setDownloadLinks(null, null);
+
         const payload = buildPayload();
 
         const res = await fetch("/api/generate", {
@@ -765,14 +815,19 @@
           `✅ OK\ncompany_slug=${data.company_slug}\n` +
           `template_saved=${data.template_saved}\n` +
           `archetype_id=${data.archetype_id || "(unknown)"}\n` +
+          `filename=${data.filename || "(none)"}\n` +
           (data.debug ? `\n--- debug ---\n${JSON.stringify(data.debug, null, 2)}` : "")
         );
 
+        // Render preview
         const iframe = $("preview");
         const doc = iframe.contentDocument || iframe.contentWindow.document;
         doc.open();
         doc.write(data.rendered_html);
         doc.close();
+
+        // Enable download links (served by your Flask routes)
+        setDownloadLinks(data.download_url || null, data.export_url || null);
 
       } catch (e) {
         console.error(e);
@@ -788,6 +843,7 @@
       doc.close();
       $("okBox").style.display = "none";
       $("errorBox").style.display = "none";
+      setDownloadLinks(null, null);
     }
 
     // -----------------------------
@@ -877,7 +933,7 @@
 
         const newItems = Array.isArray(data.items) ? data.items : [];
         if (newItems.length === 0) throw new Error("Gemini returned 0 items. Try a larger amount or add notes like “real products”.");
-        
+
         // Replace items list
         items = newItems.map((it, i) => ({
           sl_no: i + 1,
