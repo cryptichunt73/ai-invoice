@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        @page { size: A4; margin: 0; }
+        body { margin: 0; font-family: sans-serif; background: #334155; color: #fff; }
+        .header { background: #bef264; color: #000; padding: 40px; display: flex; justify-content: space-between; }
+        .content { padding: 40px; }
+        .data-row { border-bottom: 1px solid #475569; padding: 15px 0; display: flex; justify-content: space-between; }
+        .lime-text { color: #bef264; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="margin:0;">{{ invoice.title }}</h1>
+        <div style="text-align: right;"><strong>{{ invoice.number }}</strong><br>{{ invoice.date }}</div>
+    </div>
+    <div class="content">
+        <div style="margin-bottom: 40px;">
+            <span class="lime-text">RECIPIENT:</span><br><strong>{{ buyer.name }}</strong><br>{{ buyer.address }}
+        </div>
+        {% for it in items %}
+        <div class="data-row">
+            <span>{{ it.description }}</span>
+            <span class="lime-text">{{ it.amount }}</span>
+        </div>
+        {% endfor %}
+        <div style="margin-top: 40px; text-align: right;">
+            <span style="font-size: 40px; font-weight: bold;">{{ totals.grand_total }}</span>
+        </div>
+        <div style="margin-top: 60px; font-size: 10px; opacity: 0.6;">
+            BANK: {{ bank.bank_name }} | IBAN: {{ bank.iban }} | SWIFT: {{ bank.swift }}
+        </div>
+    </div>
+</body>
+</html>

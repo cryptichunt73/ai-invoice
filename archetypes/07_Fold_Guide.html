@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        @page { size: A4; margin: 0; }
+        body { margin: 0; font-family: 'Arial', sans-serif; font-size: 10px; background: #fff; }
+        .fold-line { position: absolute; left: 0; width: 100%; border-top: 1px dotted #aaa; z-index: 10; }
+        .fold-line::after { content: 'FOLD HERE'; font-size: 7px; color: #aaa; position: absolute; right: 10px; top: -10px; }
+        .section { height: 99mm; border-bottom: 2px solid #000; padding: 40px; box-sizing: border-box; position: relative; }
+        .sidebar-tag { position: absolute; left: 10px; top: 10px; background: #000; color: #fff; padding: 5px; writing-mode: vertical-rl; transform: rotate(180deg); }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        .big-label { font-size: 24px; font-weight: bold; border-left: 10px solid #000; padding-left: 15px; margin-bottom: 20px; }
+        .item-strip { border: 1px solid #000; padding: 5px; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        @media print { body { background: #fff !important; } }
+
+    </style>
+</head>
+<body>
+    <div class="fold-line" style="top: 99mm;"></div>
+    <div class="fold-line" style="top: 198mm;"></div>
+    
+    <div class="section">
+        <div class="sidebar-tag">ORIGIN</div>
+        <div class="big-label">{{ company.name }}</div>
+        <div class="grid-3">
+            <div><strong>Address:</strong><br>{{ company.address }}</div>
+            <div><strong>Invoice:</strong><br>{{ invoice.number }} / {{ invoice.date }}</div>
+            <div><strong>Category:</strong><br>{{ category }}</div>
+        </div>
+        <div style="margin-top: 40px;">
+            <strong>Consignee:</strong> {{ buyer.name }} // {{ buyer.address }}
+        </div>
+    </div>
+
+    <div class="section" style="background: #fcfcfc;">
+        <div class="sidebar-tag">CARGO</div>
+        <div class="big-label">MANIFEST</div>
+        <div style="max-height: 200px; overflow: hidden;">
+            {% for it in items %}
+            <div class="item-strip">
+                <span>{{ it.item_no }} - {{ it.description }}</span>
+                <span>{{ it.qty }} {{ it.unit }} | <strong>{{ it.amount }}</strong></span>
+            </div>
+            {% endfor %}
+        </div>
+        <div style="position: absolute; bottom: 40px; right: 40px; font-size: 30px; font-weight: bold;">
+            {{ totals.grand_total }}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="sidebar-tag">SETTLE</div>
+        <div class="big-label">BANKING</div>
+        <div class="grid-3">
+            <div><strong>Bank:</strong> {{ bank.bank_name }}</div>
+            <div><strong>IBAN:</strong> {{ bank.iban }}</div>
+            <div><strong>Swift:</strong> {{ bank.swift }}</div>
+        </div>
+        <div style="margin-top: 30px; border: 1px dashed #000; padding: 15px;">
+            {{ totals.amount_in_words }}
+        </div>
+    </div>
+    <div class="tab-top">{{ invoice.number }} • {{ invoice.date }}</div>
+
+</body>
+</html>

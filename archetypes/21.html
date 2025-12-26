@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        @page { size: A4; margin: 0; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f4f7f9; color: #334155; }
+        .container { display: flex; min-height: 297mm; }
+        .sidebar { width: 30%; background: #1e293b; color: #fff; padding: 40px; box-sizing: border-box; }
+        .main { width: 70%; padding: 60px; background: #fff; }
+        .badge { background: #38bdf8; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+        .table th { text-align: left; color: #64748b; font-size: 10px; border-bottom: 2px solid #f1f5f9; padding: 10px; }
+        .table td { padding: 15px 10px; border-bottom: 1px solid #f1f5f9; }
+        .total-card { background: #f8fafc; border-radius: 12px; padding: 20px; margin-top: 40px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="badge">PROFORMA</div>
+            <h1 style="font-size: 24px; margin: 20px 0;">{{ invoice.number }}</h1>
+            <div style="margin-top: 60px; font-size: 12px; opacity: 0.8;">
+                <strong>SHIPPER</strong><br>{{ company.name }}<br>{{ company.address }}
+            </div>
+            <div style="margin-top: 30px; font-size: 12px; opacity: 0.8;">
+                <strong>BANKING</strong><br>{{ bank.bank_name }}<br>IBAN: {{ bank.iban }}
+            </div>
+        </div>
+        <div class="main">
+            <div style="display: flex; justify-content: space-between;">
+                <div><small style="color: #94a3b8;">BILL TO</small><h2 style="margin: 5px 0;">{{ buyer.name }}</h2><p>{{ buyer.address }}</p></div>
+                <div style="text-align: right;"><small style="color: #94a3b8;">DATE</small><p><strong>{{ invoice.date }}</strong></p></div>
+            </div>
+            <table class="table">
+                <thead><tr><th>DESCRIPTION</th><th>QTY</th><th style="text-align:right">AMOUNT</th></tr></thead>
+                <tbody>
+                    {% for it in items %}
+                    <tr><td><strong>{{ it.item_no }}</strong><br><small>{{ it.description }}</small></td><td>{{ it.qty }}</td><td style="text-align:right">{{ it.amount }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="total-card">
+                <span style="color: #64748b;">Grand Total</span>
+                <span style="font-size: 24px; font-weight: bold; color: #0f172a;">{{ totals.grand_total }}</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

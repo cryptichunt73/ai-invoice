@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        @page { size: A4; margin: 10mm; }
+        body { font-family: 'Arial', sans-serif; background: #fff; color: #000; font-size: 10px; }
+        .grid-parent { display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; }
+        .box { border: 1px solid #000; padding: 10px; }
+        .header-box { grid-column: span 12; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 10px solid #000; padding-bottom: 5px; }
+        .col-4 { grid-column: span 4; }
+        .col-8 { grid-column: span 8; }
+        .col-12 { grid-column: span 12; }
+        .label-v { font-size: 8px; font-weight: bold; text-transform: uppercase; color: #666; display: block; margin-bottom: 5px; }
+        .total-stripe { grid-column: span 12; background: #000; color: #fff; padding: 20px; display: flex; justify-content: space-between; font-size: 24px; font-weight: bold; }
+        @media print { body { background: #fff !important; } }
+
+    </style>
+</head>
+<body>
+    <div class="grid-parent">
+        <div class="header-box">
+            <span style="font-size: 30px; font-weight: 900;">{{ invoice.title }}</span>
+            <span>#{{ invoice.number }} // {{ invoice.date }}</span>
+        </div>
+        <div class="box col-8">
+            <span class="label-v">Exporter</span>
+            <strong>{{ company.name }}</strong><br>{{ company.address }}
+        </div>
+        <div class="box col-4">
+            <span class="label-v">Document Category</span>
+            {{ category }}
+        </div>
+        <div class="box col-4">
+            <span class="label-v">Consignee</span>
+            {{ buyer.name }}<br>{{ buyer.address }}
+        </div>
+        <div class="box col-4">
+            <span class="label-v">Notify</span>
+            {{ notify.name }}<br>{{ notify.address }}
+        </div>
+        <div class="box col-4">
+            <span class="label-v">Logistics</span>
+            {{ invoice.port_loading }} &rarr; {{ invoice.port_discharge }}<br>Via: {{ invoice.shipment_method }}
+        </div>
+        <div class="col-12" style="padding: 10px 0;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="border-bottom: 2px solid #000;">
+                    <th style="text-align: left;">DESC</th><th style="text-align: right;">QTY</th><th style="text-align: right;">AMT</th>
+                </tr>
+                {% for it in items %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 8px 0;">{{ it.description }}</td>
+                    <td style="text-align: right;">{{ it.qty }}</td>
+                    <td style="text-align: right;">{{ it.amount }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="total-stripe">
+            <span>GRAND TOTAL</span>
+            <span>{{ totals.grand_total }}</span>
+        </div>
+        <div class="box col-12">
+            <span class="label-v">Payment Instructions</span>
+            Bank: {{ bank.bank_name }} | Account: {{ bank.account_no }} | IBAN: {{ bank.iban }} | SWIFT: {{ bank.swift }}
+        </div>
+    </div>
+    <div class="tab-top">{{ invoice.number }} • {{ invoice.date }}</div>
+
+</body>
+</html>

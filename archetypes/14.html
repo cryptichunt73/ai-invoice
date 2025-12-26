@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        @page { size: A4; margin: 20mm; }
+        body { font-family: 'Times New Roman', serif; line-height: 1.2; color: #000; }
+        .row { display: flex; margin-bottom: 30px; border-bottom: 1px solid #000; padding-bottom: 10px; }
+        .label { width: 80px; font-family: Arial; font-size: 8px; font-weight: bold; text-transform: uppercase; color: #777; flex-shrink: 0; }
+        .data { font-size: 14px; flex-grow: 1; }
+        .item-grid { display: grid; grid-template-columns: 1fr 100px; gap: 20px; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div style="font-size: 40px; font-weight: bold; margin-bottom: 60px;">{{ category }}</div>
+    <div class="row">
+        <div class="label">Origin</div>
+        <div class="data"><strong>{{ company.name }}</strong><br>{{ company.address }}</div>
+    </div>
+    <div class="row">
+        <div class="label">Recipient</div>
+        <div class="data">{{ buyer.name }}<br>{{ buyer.address }}</div>
+    </div>
+    <div class="row">
+        <div class="label">Details</div>
+        <div class="data">ID: {{ invoice.number }} / Date: {{ invoice.date }}</div>
+    </div>
+    <div class="row">
+        <div class="label">Items</div>
+        <div class="data">
+            {% for it in items %}
+            <div class="item-grid">
+                <div>{{ it.description }} <small>({{ it.qty }} {{ it.unit }})</small></div>
+                <div style="text-align:right">{{ it.amount }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row" style="border-bottom: 10px solid #000;">
+        <div class="label">Total</div>
+        <div class="data" style="font-size: 30px; font-weight: bold; text-align: right;">{{ totals.grand_total }}</div>
+    </div>
+    <div style="display: flex; gap: 20px; font-family: Arial; font-size: 9px;">
+        <div style="flex:1">BANK: {{ bank.bank_name }}<br>IBAN: {{ bank.iban }}</div>
+        <div style="flex:1">SWIFT: {{ bank.swift }}<br>PORT: {{ invoice.port_loading }}</div>
+    </div>
+</body>
+</html>

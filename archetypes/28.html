@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        body { background: #fffafb; font-family: 'Garamond', serif; padding: 50px; }
+        .border { border: 1px solid #fda4af; padding: 40px; border-radius: 5px; }
+        .accent { color: #e11d48; font-family: 'Arial'; font-size: 10px; letter-spacing: 2px; }
+        .item-list { margin-top: 40px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="border">
+        <div class="accent">EXPORT DOCUMENTATION</div>
+        <h1 style="font-weight: normal; font-size: 40px; margin: 10px 0;">{{ invoice.title }}</h1>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #fda4af; padding-bottom: 20px;">
+            <span>Ref: {{ invoice.number }}</span>
+            <span>Date: {{ invoice.date }}</span>
+        </div>
+        <div class="item-list">
+            {% for it in items %}
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <span>{{ it.description }}</span>
+                <strong>{{ it.amount }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+        <div style="margin-top: 50px; text-align: center; border-top: 1px solid #fda4af; padding-top: 20px;">
+            <div class="accent">TOTAL SETTLEMENT</div>
+            <div style="font-size: 36px; color: #e11d48;">{{ totals.grand_total }}</div>
+        </div>
+    </div>
+</body>
+</html>
