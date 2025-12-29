@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    @page { size: A4; margin: 0; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+    
+    body { 
+        margin: 0; 
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+        color: #2d3436; 
+        background: #fff;
+        line-height: 1.4;
+    }
+
+    /* Top Brand Section */
+    .header-top { 
+        display: flex; 
+        align-items: stretch; 
+        background: #fff;
+    }
+    .logo-block { 
+        background: #2d3436; 
+        color: #fff; 
+        width: 120px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 42px; 
+        font-weight: 900;
+    }
+    .brand-text { 
+        padding: 30px 40px; 
+        flex-grow: 1;
+    }
+    .brand-text h1 { 
+        margin: 0; 
+        font-size: 32px; 
+        text-transform: uppercase; 
+        letter-spacing: 2px;
+    }
+    .brand-sub { font-size: 11px; color: #636e72; margin-top: 5px; }
+
+    /* Info Grid */
+    .info-grid { 
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        background: #fff; 
+        border-top: 1px solid #dfe6e9;
+        border-bottom: 1px solid #dfe6e9;
+    }
+    .info-cell { padding: 25px 40px; border-right: 1px solid #dfe6e9; }
+    .label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #2d3436; margin-bottom: 8px; display: block; }
+    .value { font-size: 12px; display: block; }
+
+    /* Main Layout */
+    .main-layout { display: flex; align-items: stretch; min-height: 500px; }
+    
+    /* Left Sidebar */
+    .sidebar { 
+        width: 200px; 
+        background: #f9f9f9; 
+        padding: 40px; 
+        border-right: 1px solid #dfe6e9;
+    }
+    .sidebar-item { margin-bottom: 30px; }
+
+    /* Main Content Area */
+    .content-area { flex-grow: 1; display: flex; flex-direction: column; }
+    
+    table { width: 100%; border-collapse: collapse; }
+    
+    /* Dark Table Header */
+    thead th { 
+        background: #2d3436; 
+        color: #fff; 
+        text-align: left; 
+        padding: 15px 20px; 
+        font-size: 11px; 
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    tbody td { 
+        padding: 15px 20px; 
+        font-size: 12px; 
+        border-bottom: 1px solid #dfe6e9;
+    }
+    
+    /* Alternating gray rows */
+    tbody tr:nth-child(even) { background: #fdfdfd; }
+    tbody tr:nth-child(odd) { background: #fff; }
+
+    /* Footer / Summary Section */
+    .footer-summary { 
+        margin-top: auto; 
+        background: #fab1a0; /* Muted Terracotta/Peach accent from reference */
+        display: flex; 
+        justify-content: flex-end; 
+        padding: 30px 40px;
+    }
+    .total-item { text-align: right; margin-left: 50px; }
+    .total-label { font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .total-value { font-size: 18px; font-weight: 900; display: block; }
+
+    .bottom-note { 
+        background: #2d3436; 
+        color: #fff; 
+        text-align: center; 
+        padding: 15px; 
+        font-size: 11px; 
+        letter-spacing: 1px;
+    }
+</style>
+</head>
+<body>
+
+    <header class="header-top">
+        <div class="logo-block">EX</div>
+        <div class="brand-text">
+            <h1>{{ company.name }}</h1>
+            <div class="brand-sub">{{ company.address }}</div>
+        </div>
+    </header>
+
+    <section class="info-grid">
+        <div class="info-cell">
+            <span class="label">Invoice Details</span>
+            <span class="value"><strong>#{{ invoice.number }}</strong></span>
+            <span class="value">{{ invoice.date }}</span>
+        </div>
+        <div class="info-cell">
+            <span class="label">Client Contact</span>
+            <span class="value">{{ buyer.name }}</span>
+            <span class="value">{{ buyer.address }}</span>
+        </div>
+        <div class="info-cell" style="border-right: none;">
+            <span class="label">Shipping Via</span>
+            <span class="value">{{ invoice.shipment_method }}</span>
+            <span class="value">{{ invoice.port_loading }} &rarr; {{ invoice.port_discharge }}</span>
+        </div>
+    </section>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <div class="sidebar-item">
+                <span class="label">Notify Party</span>
+                <span class="value">{{ notify.name }}</span>
+            </div>
+            <div class="sidebar-item">
+                <span class="label">Bank Account</span>
+                <span class="value">{{ bank.bank_name }}</span>
+                <span class="value">No: {{ bank.account_no }}</span>
+            </div>
+            <div class="sidebar-item">
+                <span class="label">SWIFT / IBAN</span>
+                <span class="value">{{ bank.swift }}</span>
+                <span class="value">{{ bank.iban }}</span>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60%;">Description</th>
+                        <th style="width: 10%;">Qty</th>
+                        <th style="width: 15%;">Unit Price</th>
+                        <th style="width: 15%; text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for it in items %}
+                    <tr>
+                        <td><strong>{{ it.item_no }}</strong><br><small style="color: #636e72;">{{ it.description }}</small></td>
+                        <td>{{ it.qty }} {{ it.unit }}</td>
+                        <td>{{ it.rate }}</td>
+                        <td style="text-align: right;">{{ it.amount }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="footer-summary">
+                <div class="total-item" style="flex-grow: 1; text-align: left; margin: 0;">
+                    <span class="label">Amount in Words</span>
+                    <span class="value" style="font-style: italic;">{{ totals.amount_in_words }}</span>
+                </div>
+                <div class="total-item">
+                    <span class="total-label">Subtotal</span>
+                    <span class="total-value">{{ totals.subtotal }}</span>
+                </div>
+                <div class="total-item">
+                    <span class="total-label">Grand Total</span>
+                    <span class="total-value" style="font-size: 24px;">{{ totals.grand_total }}</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bottom-note">
+        THANK YOU FOR YOUR BUSINESS // {{ category }} DEPARTMENT
+    </footer>
+
+</body>
+</html>

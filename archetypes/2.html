@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    @page { size: A4; margin: 0; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+    
+    body { 
+        margin: 0; 
+        font-family: 'Helvetica', 'Arial', sans-serif; 
+        color: #333; 
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        min-height: 297mm;
+    }
+
+    /* Header Section */
+    .header { 
+        background: #222; 
+        color: #fff; 
+        padding: 40px 50px; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: flex-start;
+    }
+    .header h1 { 
+        font-size: 60px; 
+        margin: 0; 
+        letter-spacing: 4px; 
+        text-transform: uppercase;
+        font-weight: 400;
+    }
+    .company-info { text-align: right; font-size: 11px; line-height: 1.5; }
+
+    /* Address & Meta Section */
+    .meta-container { padding: 40px 50px; display: flex; justify-content: space-between; }
+    .meta-box { width: 45%; font-size: 12px; }
+    .label { font-weight: bold; color: #000; margin-bottom: 5px; display: block; }
+
+    /* Table Section */
+    .content { flex-grow: 1; padding: 0 50px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th { 
+        text-align: left; 
+        padding: 12px 10px; 
+        border-bottom: 2px solid #000; 
+        font-size: 12px; 
+        text-transform: uppercase;
+    }
+    td { padding: 12px 10px; font-size: 12px; border-bottom: 1px solid #eee; }
+    
+    /* Alternating gray rows like the image */
+    tbody tr:nth-child(even) { background: #f2f2f2; }
+
+    /* Totals Section */
+    .summary-wrapper { display: flex; justify-content: space-between; padding: 20px 50px 40px; }
+    .bank-details { width: 50%; font-size: 10px; line-height: 1.4; color: #555; }
+    .totals-table { width: 35%; border-top: 2px solid #000; }
+    .totals-table tr td { padding: 8px 0; border: none; }
+    .grand-total-row { background: #eee; font-weight: bold; font-size: 16px; }
+
+    /* Footer Section */
+    .footer { 
+        background: #222; 
+        color: #fff; 
+        text-align: center; 
+        padding: 15px; 
+        font-size: 12px;
+        margin-top: auto;
+    }
+</style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>{{ invoice.title }}</h1>
+        <div class="company-info">
+            <strong>{{ company.name }}</strong><br>
+            {{ company.address }}
+        </div>
+    </div>
+
+    <div class="meta-container">
+        <div class="meta-box">
+            <span class="label">Bill To:</span>
+            <strong>{{ buyer.name }}</strong><br>
+            {{ buyer.address }}<br><br>
+            <span class="label">Notify:</span>
+            {{ notify.name }}<br>
+            {{ notify.address }}
+        </div>
+        <div class="meta-box" style="text-align: right;">
+            <p><strong>{{ category }} No:</strong> {{ invoice.number }}</p>
+            <p><strong>Date of Issue:</strong> {{ invoice.date }}</p>
+            <p><strong>Shipment:</strong> {{ invoice.shipment_method }}</p>
+            <p><strong>Route:</strong> {{ invoice.port_loading }} to {{ invoice.port_discharge }}</p>
+        </div>
+    </div>
+
+    <div class="content">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 10%;">SL</th>
+                    <th style="width: 50%;">Description</th>
+                    <th style="width: 10%;">Qty</th>
+                    <th style="width: 15%;">Rate</th>
+                    <th style="width: 15%; text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td>{{ it.sl_no }}</td>
+                    <td><strong>{{ it.item_no }}</strong> - {{ it.description }}</td>
+                    <td>{{ it.qty }} {{ it.unit }}</td>
+                    <td>{{ it.rate }}</td>
+                    <td style="text-align: right;">{{ it.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="summary-wrapper">
+        <div class="bank-details">
+            <span class="label">Payment Instructions:</span>
+            Bank: {{ bank.bank_name }}<br>
+            Account Name: {{ bank.account_name }}<br>
+            Account No: <strong>{{ bank.account_no }}</strong><br>
+            SWIFT: {{ bank.swift }} | IBAN: {{ bank.iban }}<br>
+            IFSC: {{ bank.ifsc }} | Routing: {{ bank.routing }}<br>
+            Branch: {{ bank.branch }}
+        </div>
+        
+        <table class="totals-table">
+            <tr>
+                <td>Subtotal</td>
+                <td style="text-align: right;">{{ totals.subtotal }}</td>
+            </tr>
+            <tr>
+                <td>Freight / Ins.</td>
+                <td style="text-align: right;">{{ totals.freight }} / {{ totals.insurance }}</td>
+            </tr>
+            <tr>
+                <td>Other</td>
+                <td style="text-align: right;">{{ totals.other }}</td>
+            </tr>
+            <tr class="grand-total-row">
+                <td style="padding: 10px;">Total</td>
+                <td style="text-align: right; padding: 10px;">{{ totals.grand_total }}</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="font-size: 9px; font-weight: normal; padding-top: 10px;">
+                    <em>{{ totals.amount_in_words }}</em>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        Thank you for your business!
+    </div>
+
+</body>
+</html>

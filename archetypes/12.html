@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page { size: A4; margin: 0; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+    
+    body { 
+        margin: 0; 
+        padding: 0;
+        font-family: 'Palatino', 'Georgia', serif; 
+        color: #2c3e50; 
+        background-color: #f0f8ff; /* Soft Alice Blue background */
+    }
+
+    .main-wrapper {
+        padding: 50px;
+        min-height: 100vh;
+    }
+
+    /* Elegant Floral Header */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 50px;
+    }
+
+    .brand { display: flex; align-items: center; }
+    .flower-logo {
+        width: 60px;
+        height: 60px;
+        margin-right: 20px;
+        border: 2px solid #2c3e50;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+    }
+
+    .brand-text h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+    
+    .doc-meta { text-align: right; }
+    .doc-meta h2 { font-size: 40px; margin: 0; text-transform: uppercase; font-weight: 900; }
+    .meta-table { margin-top: 10px; font-size: 13px; float: right; }
+    .meta-table td { padding: 2px 10px; }
+
+    /* Contact Details Grid */
+    .contact-container {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 40px;
+        margin-bottom: 40px;
+        font-size: 13px;
+    }
+
+    .sender-info p, .recipient-info p { margin: 3px 0; line-height: 1.4; }
+    .label { font-weight: bold; text-transform: uppercase; font-size: 11px; display: block; margin-bottom: 5px; border-bottom: 1px solid #ccc; }
+
+    /* Specialized Ledger Table */
+    table { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    
+    thead th {
+        background-color: #1a252f; /* Deep Navy header */
+        color: #fff;
+        text-align: left;
+        padding: 12px;
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+
+    tbody td {
+        padding: 12px;
+        border: 1px solid #d6eaf8;
+        font-size: 13px;
+    }
+
+    /* Summary Calculation Block */
+    .totals-area {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 30px;
+    }
+
+    .totals-table { width: 280px; background: transparent; box-shadow: none; }
+    .totals-table td { border: none; padding: 6px 12px; border-bottom: 1px solid #d6eaf8; }
+    
+    .grand-total-row {
+        background-color: #fff;
+        font-weight: bold;
+        font-size: 16px;
+        border: 2px solid #1a252f !important;
+    }
+
+    /* Detailed Footer */
+    .footer {
+        margin-top: 60px;
+        text-align: center;
+        font-size: 12px;
+        color: #5d6d7e;
+        border-top: 1px solid #d6eaf8;
+        padding-top: 20px;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <header class="header">
+        <div class="brand">
+            <div class="flower-logo">❀</div>
+            <div class="brand-text">
+                <h1>{{ company.name }}</h1>
+            </div>
+        </div>
+        <div class="doc-meta">
+            <h2>{{ invoice.title }}</h2>
+            <table class="meta-table">
+                <tr><td><strong>{{ invoice.title }} #:</strong></td><td>{{ invoice.number }}</td></tr>
+                <tr><td><strong>Date:</strong></td><td>{{ invoice.date }}</td></tr>
+                <tr><td><strong>Category:</strong></td><td>{{ category }}</td></tr>
+            </table>
+        </div>
+    </header>
+
+    <div class="contact-container">
+        <div class="sender-info">
+            <span class="label">Our Studio</span>
+            <p>{{ company.address }}</p>
+            <p>Phone: {{ bank.branch }}</p>
+            <p>Email: {{ bank.swift }}@studio.com</p>
+        </div>
+        <div class="recipient-info" style="text-align: right;">
+            <span class="label">Bill To</span>
+            <p><strong>{{ buyer.name }}</strong></p>
+            <p>{{ buyer.address }}</p>
+            <p>Phone: {{ buyer.phone if buyer.phone else 'N/A' }}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 10%;">Item #</th>
+                <th style="width: 40%;">Description</th>
+                <th style="width: 10%;">Qty</th>
+                <th style="width: 15%;">Unit Price</th>
+                <th style="width: 10%;">Discount</th>
+                <th style="width: 15%; text-align: right;">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for it in items %}
+            <tr>
+                <td>{{ it.item_no }}</td>
+                <td>{{ it.description }}</td>
+                <td>{{ it.qty }}</td>
+                <td>{{ it.rate }}</td>
+                <td>-</td> <td style="text-align: right;">{{ it.amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals-area">
+        <table class="totals-table">
+            <tr>
+                <td>Subtotal</td>
+                <td style="text-align: right;">{{ totals.subtotal }}</td>
+            </tr>
+            <tr>
+                <td>Tax Rate ({{ totals.insurance }}%)</td>
+                <td style="text-align: right;">{{ totals.other }}</td>
+            </tr>
+            <tr>
+                <td>Deposit Received</td>
+                <td style="text-align: right;">$50.00</td> </tr>
+            <tr class="grand-total-row">
+                <td>TOTAL</td>
+                <td style="text-align: right;">{{ totals.grand_total }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        <p>Please make all checks payable to <strong>{{ company.name }}</strong></p>
+        <p>Total due in 30 days. Overdue accounts subject to a service charge of 1.5% per month.</p>
+        <p><em>{{ totals.amount_in_words }}</em></p>
+        <p style="margin-top: 15px; font-size: 10px; opacity: 0.6;">{{ company.address }} | {{ bank.bank_name }} A/C: {{ bank.account_no }}</p>
+    </div>
+</div>
+
+</body>
+</html>

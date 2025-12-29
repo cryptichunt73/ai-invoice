@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page { size: A4; margin: 0; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+    
+    body { 
+        margin: 0; 
+        padding: 0;
+        font-family: 'Helvetica', 'Arial', sans-serif; 
+        color: #333; 
+        background: #fff;
+    }
+
+    /* Split Header Layout */
+    .header-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: 200px;
+    }
+
+    .header-left {
+        background: #e8eaf6; /* Soft lavender-gray from reference */
+        padding: 40px;
+    }
+
+    .header-right {
+        background: #000;
+        color: #fff;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .company-name { font-size: 28px; font-weight: bold; margin-bottom: 10px; color: #1a237e; }
+    .company-addr { font-size: 11px; line-height: 1.4; }
+
+    .doc-type { font-size: 32px; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; letter-spacing: 2px; }
+    .meta-table { width: 100%; font-size: 12px; }
+    .meta-table td { padding: 3px 0; }
+    .meta-label { opacity: 0.7; text-transform: uppercase; font-size: 10px; }
+
+    /* Contact Section */
+    .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 30px 40px;
+        gap: 40px;
+        border-bottom: 1px solid #eee;
+    }
+    .contact-box h3 { font-size: 12px; text-transform: uppercase; margin-bottom: 10px; border-bottom: 2px solid #000; display: inline-block; }
+    .contact-info { font-size: 12px; line-height: 1.5; }
+
+    /* Logistics Bar */
+    .logistics-bar {
+        background: #000;
+        color: #fff;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        margin: 0 40px;
+        font-size: 10px;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+    .log-cell { padding: 8px 15px; border-right: 1px solid #444; }
+    .log-cell:last-child { border-right: none; }
+
+    /* Main Table */
+    .table-content { padding: 20px 40px; flex-grow: 1; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background: #000; color: #fff; text-align: left; padding: 10px; font-size: 11px; text-transform: uppercase; }
+    tbody td { padding: 12px 10px; border-bottom: 1px solid #ddd; font-size: 13px; }
+    
+    /* Summary Area */
+    .bottom-wrapper { padding: 20px 40px; display: flex; flex-direction: column; align-items: flex-end; }
+    .summary-table { width: 250px; }
+    .summary-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
+    .summary-row.total { border-bottom: 3px double #000; font-weight: bold; font-size: 16px; margin-top: 10px; }
+
+    /* Declaration & Footer */
+    .declaration { padding: 20px 40px; font-size: 11px; font-style: italic; color: #666; }
+    
+    .signature-area {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 0 40px 40px;
+        gap: 40px;
+    }
+    .sig-box { border-top: 1px solid #000; padding-top: 5px; font-size: 10px; font-weight: bold; text-transform: uppercase; background: #e8eaf6; padding-left: 10px; }
+
+    .footer-black { background: #000; color: #fff; text-align: center; padding: 10px; font-size: 12px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="header-left">
+            <div class="company-name">{{ company.name }}</div>
+            <div class="company-addr">
+                {{ company.address }}<br>
+                Phone: {{ bank.branch }} </div>
+        </div>
+        <div class="header-right">
+            <div class="doc-type">Commercial {{ invoice.title }}</div>
+            <table class="meta-table">
+                <tr><td class="meta-label">{{ invoice.title }} No:</td><td>{{ invoice.number }}</td></tr>
+                <tr><td class="meta-label">Date:</td><td>{{ invoice.date }}</td></tr>
+                <tr><td class="meta-label">Due Date:</td><td>{{ invoice.date }}</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <section class="contact-grid">
+        <div class="contact-box">
+            <h3>Bill To:</h3>
+            <div class="contact-info">
+                <strong>{{ buyer.name }}</strong><br>
+                {{ buyer.address }}
+            </div>
+        </div>
+        <div class="contact-box">
+            <h3>Ship To:</h3>
+            <div class="contact-info">
+                <strong>{{ notify.name }}</strong><br>
+                {{ notify.address }}
+            </div>
+        </div>
+    </section>
+
+    <div class="logistics-bar">
+        <div class="log-cell">Ship Date: {{ invoice.date }}</div>
+        <div class="log-cell">Ship Via: {{ invoice.shipment_method }}</div>
+        <div class="log-cell">Port Load: {{ invoice.port_loading }}</div>
+        <div class="log-cell">Port Discharge: {{ invoice.port_discharge }}</div>
+    </div>
+
+    <div class="table-content">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50%;">Description</th>
+                    <th style="width: 15%;">Quantity</th>
+                    <th style="width: 15%;">Unit Price</th>
+                    <th style="width: 20%; text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td><strong>{{ it.item_no }}</strong> - {{ it.description }}</td>
+                    <td>{{ it.qty }} {{ it.unit }}</td>
+                    <td>{{ it.rate }}</td>
+                    <td style="text-align: right;">{{ it.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bottom-wrapper">
+        <div class="summary-table">
+            <div class="summary-row"><span>Subtotal</span><span>{{ totals.subtotal }}</span></div>
+            <div class="summary-row"><span>Shipping/Freight</span><span>{{ totals.freight }}</span></div>
+            <div class="summary-row total"><span>TOTAL</span><span>{{ totals.grand_total }}</span></div>
+        </div>
+        <div style="font-size: 10px; margin-top: 10px;">{{ totals.amount_in_words }}</div>
+    </div>
+
+    <div class="declaration">
+        I declare all the information contained in this {{ invoice.title }} to be true and correct.
+    </div>
+
+    <div class="signature-area">
+        <div class="sig-box">Shipper Signature</div>
+        <div class="sig-box">Date</div>
+    </div>
+
+    <div class="footer-black">
+        Thank you for your business!
+    </div>
+
+</body>
+</html>

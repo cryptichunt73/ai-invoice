@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    @page { size: A4; margin: 0; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+    
+    body { margin: 0; font-family: 'Arial', sans-serif; color: #333; }
+    
+    .blue-header { background: #3c6487; color: #fff; padding: 40px 50px; display: flex; justify-content: space-between; align-items: baseline; }
+    .blue-header h1 { font-size: 64px; margin: 0; text-transform: uppercase; letter-spacing: 5px; }
+    .company-header { text-align: right; font-size: 14px; }
+
+    .meta-address-row { display: grid; grid-template-columns: 1fr 1fr; padding: 40px 50px; }
+    .meta-data { line-height: 2; }
+    .billing-data { text-align: right; }
+
+    .main-content { padding: 0 50px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 10px; text-align: left; }
+    tbody td { padding: 12px 10px; border-bottom: 1px solid #eee; }
+    .zebra-row { background: #f2f2f2; }
+
+    .summary-area { display: flex; justify-content: flex-end; padding: 20px 50px; }
+    .summary-table { width: 250px; }
+    .summary-table tr td { padding: 8px 0; }
+    .grand-total { border-top: 2px solid #3c6487; font-weight: bold; font-size: 18px; color: #3c6487; }
+
+    .footer-bar { background: #3c6487; color: #fff; text-align: center; padding: 15px; position: fixed; bottom: 0; width: 100%; font-size: 14px; }
+</style>
+</head>
+<body>
+    <div class="blue-header">
+        <h1>{{ invoice.title }}</h1>
+        <div class="company-header">
+            <strong>{{ company.name }}</strong><br>{{ company.address }}
+        </div>
+    </div>
+
+    <div class="meta-address-row">
+        <div class="meta-data">
+            <strong>{{ invoice.title }} No.</strong>: {{ invoice.number }}<br>
+            <strong>Date of Issue</strong>: {{ invoice.date }}<br>
+            <strong>Due Date</strong>: {{ invoice.date }}
+        </div>
+        <div class="billing-data">
+            <strong>Bill To</strong><br>
+            {{ buyer.name }}<br>{{ buyer.address }}
+        </div>
+    </div>
+
+    <div class="main-content">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th><th>Description</th><th>Hours/Qty</th><th>Rate</th><th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr class="{{ loop.cycle('', 'zebra-row') }}">
+                    <td>{{ it.sl_no }}</td>
+                    <td>{{ it.description }}</td>
+                    <td>{{ it.qty }}</td>
+                    <td>{{ it.rate }}</td>
+                    <td>{{ it.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="summary-area">
+        <table class="summary-table">
+            <tr><td>Subtotal</td><td style="text-align: right;">{{ totals.subtotal }}</td></tr>
+            <tr><td>Tax Rate ({{ totals.insurance }}%)</td><td style="text-align: right;">{{ totals.other }}</td></tr>
+            <tr class="grand-total"><td>Total</td><td style="text-align: right;">{{ totals.grand_total }}</td></tr>
+        </table>
+    </div>
+
+    <div style="padding: 0 50px 100px;">
+        <p><strong>Terms:</strong> {{ totals.amount_in_words }}</p>
+        <p>Bank: {{ bank.bank_name }} | Swift: {{ bank.swift }} | Acc: {{ bank.account_no }}</p>
+    </div>
+
+    <div class="footer-bar">Thank you for your business!</div>
+</body>
+</html>

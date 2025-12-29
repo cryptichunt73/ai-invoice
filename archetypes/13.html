@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page { size: A4; margin: 0; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+    
+    body { 
+        margin: 0; 
+        padding: 40px 50px;
+        font-family: 'Courier New', Courier, monospace; /* Industrial/Contractor feel */
+        color: #333; 
+        background-color: #fff;
+    }
+
+    /* Top Branding Section */
+    .header-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        margin-bottom: 50px;
+    }
+
+    .logo-block {
+        background-color: #444341; /* Charcoal gray from image */
+        color: #fff;
+        padding: 30px;
+        width: 320px;
+    }
+
+    .logo-block h1 { margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
+    .logo-block p { margin: 10px 0 0; font-size: 14px; opacity: 0.9; font-style: italic; }
+
+    .doc-title-area {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .doc-title-area h2 { 
+        font-size: 48px; 
+        margin: 0; 
+        color: #444341; 
+        font-weight: normal;
+        letter-spacing: 5px;
+    }
+
+    /* Info Bar */
+    .info-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 40px;
+        font-size: 13px;
+    }
+
+    .meta-details { text-align: right; }
+    .label { font-weight: bold; text-transform: uppercase; font-size: 11px; margin-right: 5px; }
+
+    /* Contractor Table */
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+    }
+
+    .invoice-table thead th {
+        background-color: #444341;
+        color: #fff;
+        text-align: left;
+        padding: 10px;
+        font-size: 12px;
+        text-transform: uppercase;
+        border: 1px solid #444341;
+    }
+
+    .invoice-table tbody td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 14px;
+    }
+
+    /* Alternating Sandy Row Color */
+    .invoice-table tbody tr:nth-child(even) { background-color: #f9f5e8; }
+
+    /* Summary Section */
+    .summary-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .summary-line {
+        width: 250px;
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+    }
+
+    .grand-total {
+        background-color: #444341;
+        color: #fff;
+        padding: 10px;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    /* Footer */
+    .footer {
+        margin-top: 80px;
+        text-align: center;
+        font-size: 11px;
+        line-height: 1.6;
+        color: #666;
+    }
+
+</style>
+</head>
+<body>
+
+    <div class="header-grid">
+        <div class="logo-block">
+            <h1>{{ company.name }}</h1>
+            <p>Building dreams out of drywall</p>
+        </div>
+        <div class="doc-title-area">
+            <h2>{{ invoice.title }}</h2>
+            <div class="meta-details" style="margin-top: 20px;">
+                <p><span class="label">DATE:</span> {{ invoice.date }}</p>
+                <p><span class="label">{{ invoice.title }} #:</span> {{ invoice.number }}</p>
+                <p><span class="label">FOR:</span> {{ category }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <div>
+            <p>{{ company.address }}</p>
+            <p>{{ bank.branch }}</p>
+        </div>
+        <div style="text-align: right;">
+            <p><span class="label">BILL TO:</span></p>
+            <p><strong>{{ buyer.name }}</strong></p>
+            <p>{{ buyer.address }}</p>
+        </div>
+    </div>
+
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th style="width: 50%;">Description</th>
+                <th style="width: 15%;">Hours</th>
+                <th style="width: 15%;">Rate</th>
+                <th style="width: 20%; text-align: right;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for it in items %}
+            <tr>
+                <td>{{ it.description }}</td>
+                <td>{{ it.qty }}</td> <td>{{ it.rate }}</td>
+                <td style="text-align: right;">{{ it.amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="summary-wrapper">
+        <div class="summary-line"><span>SUBTOTAL</span> <span>{{ totals.subtotal }}</span></div>
+        <div class="summary-line"><span>TAX RATE</span> <span>{{ totals.insurance }}%</span></div>
+        <div class="summary-line"><span>SALES TAX</span> <span>{{ totals.other }}</span></div>
+        <div class="summary-line grand-total">
+            <span>TOTAL</span>
+            <span>{{ totals.grand_total }}</span>
+        </div>
+        <p style="font-size: 10px; margin-top: 10px; font-style: italic;">{{ totals.amount_in_words }}</p>
+    </div>
+
+    <footer class="footer">
+        <p>Make all checks payable to <strong>{{ company.name }}</strong></p>
+        <p>Total due in 15 days. Overdue accounts subject to a service charge of 1.5% per month.</p>
+        <p>THANK YOU FOR YOUR BUSINESS!</p>
+        <p style="margin-top: 10px; font-size: 9px; opacity: 0.7;">
+            {{ bank.bank_name }} | A/C: {{ bank.account_no }} | SWIFT: {{ bank.swift }}
+        </p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page { size: A4; margin: 0; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+    
+    body { 
+        margin: 0; 
+        padding: 0;
+        font-family: 'Inter', 'Helvetica', 'Arial', sans-serif; 
+        color: #000; 
+        background: #fff;
+    }
+
+    /* Top Branding Block */
+    .brand-section {
+        display: flex;
+        justify-content: space-between;
+        padding: 50px;
+    }
+
+    .black-box {
+        background: #000;
+        color: #fff;
+        padding: 30px;
+        width: 350px;
+    }
+
+    .black-box h1 { margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
+    .black-box p { margin: 10px 0 0; font-size: 11px; opacity: 0.8; }
+
+    .invoice-meta { text-align: right; }
+    .invoice-meta h2 { font-size: 32px; margin: 0; font-weight: 800; }
+    .invoice-meta p { margin: 5px 0; font-size: 14px; }
+
+    /* Horizontal Info Rows */
+    .info-container { padding: 0 50px; }
+    
+    .info-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        border-top: 2px solid #000;
+        border-bottom: 2px solid #000;
+        margin-bottom: 30px;
+    }
+
+    .info-cell {
+        padding: 15px 10px;
+        border-right: 1px solid #eee;
+    }
+    .info-cell:last-child { border-right: none; }
+
+    .label {
+        display: block;
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .value { font-size: 12px; line-height: 1.4; }
+
+    /* Table Styling */
+    .table-container { padding: 0 50px; min-height: 350px; }
+    
+    table { width: 100%; border-collapse: collapse; }
+    
+    thead th {
+        text-align: left;
+        padding: 10px;
+        font-size: 11px;
+        text-transform: uppercase;
+        border-bottom: 2px solid #000;
+    }
+
+    tbody td {
+        padding: 15px 10px;
+        font-size: 13px;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Totals & Footer */
+    .summary-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        padding: 30px 50px;
+    }
+
+    .summary-table { width: 300px; }
+    .sum-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
+    .sum-row.total { 
+        border-top: 2px solid #000; 
+        font-weight: bold; 
+        font-size: 18px; 
+        margin-top: 10px; 
+        padding-top: 15px; 
+    }
+
+    .footer-black {
+        background: #000;
+        color: #fff;
+        padding: 40px 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 50px;
+    }
+
+    .footer-contact { font-size: 11px; line-height: 1.6; }
+    .footer-thank-you { font-size: 28px; font-weight: 800; text-transform: uppercase; }
+
+</style>
+</head>
+<body>
+
+    <section class="brand-section">
+        <div class="black-box">
+            <h1>{{ company.name }}</h1>
+            <p>Make all checks payable to {{ bank.account_name }}</p>
+        </div>
+        <div class="invoice-meta">
+            <h2>{{ invoice.title }} #{{ invoice.number }}</h2>
+            <p>{{ invoice.date }}</p>
+        </div>
+    </section>
+
+    <div class="info-container">
+        <div class="info-row">
+            <div class="info-cell">
+                <span class="label">To</span>
+                <div class="value"><strong>{{ buyer.name }}</strong><br>{{ buyer.address }}</div>
+            </div>
+            <div class="info-cell">
+                <span class="label">Notify Party</span>
+                <div class="value">{{ notify.name }}<br>{{ notify.address }}</div>
+            </div>
+            <div class="info-cell">
+                <span class="label">Address</span>
+                <div class="value">{{ company.address }}</div>
+            </div>
+            <div class="info-cell">
+                <span class="label">Phone / Banking</span>
+                <div class="value">{{ bank.bank_name }}<br>A/C: {{ bank.account_no }}</div>
+            </div>
+        </div>
+
+        <div class="info-row" style="border-top: none; margin-top: -32px;">
+            <div class="info-cell">
+                <span class="label">Shipment Method</span>
+                <div class="value">{{ invoice.shipment_method }}</div>
+            </div>
+            <div class="info-cell">
+                <span class="label">Ports</span>
+                <div class="value">{{ invoice.port_loading }} to {{ invoice.port_discharge }}</div>
+            </div>
+            <div class="info-cell">
+                <span class="label">Category</span>
+                <div class="value">{{ category }}</div>
+            </div>
+            <div class="info-cell">
+                <span class="label">Due Date</span>
+                <div class="value">{{ invoice.date }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 10%;">Qty</th>
+                    <th style="width: 50%;">Description</th>
+                    <th style="width: 20%;">Unit Price</th>
+                    <th style="width: 20%; text-align: right;">Line Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td>{{ it.qty }} {{ it.unit }}</td>
+                    <td><strong>{{ it.item_no }}</strong> - {{ it.description }}</td>
+                    <td>{{ it.rate }}</td>
+                    <td style="text-align: right;">{{ it.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="summary-wrapper">
+        <div class="summary-table">
+            <div class="sum-row"><span>Subtotal</span><span>{{ totals.subtotal }}</span></div>
+            <div class="sum-row"><span>Shipping & Freight</span><span>{{ totals.freight }}</span></div>
+            <div class="sum-row"><span>Insurance / Taxes</span><span>{{ totals.insurance }}</span></div>
+            <div class="sum-row"><span>Other Fees</span><span>{{ totals.other }}</span></div>
+            <div class="sum-row total">
+                <span>TOTAL</span>
+                <span>{{ totals.grand_total }}</span>
+            </div>
+            <p style="font-size: 11px; margin-top: 20px; text-align: right; font-style: italic;">
+                {{ totals.amount_in_words }}
+            </p>
+        </div>
+    </div>
+
+    <footer class="footer-black">
+        <div class="footer-contact">
+            SWIFT: {{ bank.swift }} | IBAN: {{ bank.iban }}<br>
+            Branch: {{ bank.branch }} | IFSC: {{ bank.ifsc }}<br>
+            {{ company.address }}
+        </div>
+        <div class="footer-thank-you">THANK YOU</div>
+    </footer>
+
+</body>
+</html>

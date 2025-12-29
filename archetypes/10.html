@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page { size: A4; margin: 0; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+    
+    body { 
+        margin: 0; 
+        padding: 0;
+        font-family: 'Helvetica', 'Arial', sans-serif; 
+        color: #333; 
+        background: #fff;
+    }
+
+    /* Vibrant Green Header */
+    .header-banner {
+        background-color: #8db551; /* Primary Green */
+        padding: 40px 50px;
+        position: relative;
+    }
+
+    /* Decorative light green accent in corner */
+    .header-banner::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 150px;
+        height: 40px;
+        background: #fef5d1; /* Light yellow accent from reference */
+    }
+
+    .header-banner h1 {
+        margin: 0;
+        font-size: 64px;
+        color: #000;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        font-weight: 900;
+    }
+
+    /* Addressing Section */
+    .address-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 40px 50px;
+        gap: 50px;
+    }
+
+    .bill-to h3 { margin: 0 0 10px 0; font-size: 16px; }
+    .bill-to p { margin: 2px 0; font-size: 13px; line-height: 1.4; }
+
+    .invoice-meta {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        row-gap: 5px;
+        font-size: 13px;
+        text-align: right;
+    }
+    .meta-label { font-weight: bold; }
+
+    /* Itemized Table */
+    .content-area { padding: 0 50px; }
+    
+    table { width: 100%; border-collapse: collapse; }
+    
+    thead th {
+        background-color: #8db551;
+        color: #000;
+        text-align: left;
+        padding: 12px 10px;
+        font-size: 14px;
+    }
+
+    tbody td {
+        padding: 12px 10px;
+        font-size: 13px;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Alternating row highlight */
+    tbody tr:nth-child(even) { background-color: #f7faed; }
+
+    /* Financial Summary */
+    .summary-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        padding: 20px 50px;
+    }
+
+    .summary-box { width: 300px; border: 1px solid #eee; }
+    .sum-row { display: flex; justify-content: space-between; padding: 8px 15px; font-size: 14px; }
+    
+    .total-row {
+        background-color: #8db551;
+        color: #000;
+        font-weight: bold;
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+
+    /* Footer Blocks */
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 40px 50px;
+        gap: 60px;
+    }
+
+    .footer-block h4 { 
+        margin: 0 0 10px 0; 
+        font-size: 15px; 
+        border-bottom: 2px solid #8db551; 
+        display: inline-block;
+        padding-bottom: 3px;
+    }
+    .footer-block p { font-size: 12px; margin: 5px 0; line-height: 1.5; }
+
+    .signature-area {
+        margin-top: 50px;
+        border-top: 2px solid #333;
+        padding-top: 10px;
+        text-align: center;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 12px;
+    }
+
+</style>
+</head>
+<body>
+
+    <header class="header-banner">
+        <h1>Invoice</h1>
+    </header>
+
+    <div class="address-section">
+        <div class="bill-to">
+            <h3>Bill To:</h3>
+            <p><strong>{{ buyer.name }}</strong></p>
+            <p>{{ buyer.address }}</p>
+            <p>Email: {{ buyer.email if buyer.email else 'N/A' }}</p>
+        </div>
+        <div class="invoice-meta">
+            <span class="meta-label">Invoice #:</span> <span>{{ invoice.number }}</span>
+            <span class="meta-label">PO #:</span> <span>{{ invoice.po_number if invoice.po_number else '123123123' }}</span>
+            <span class="meta-label">Due Date:</span> <span>{{ invoice.date }}</span>
+            <span class="meta-label">Invoice Date:</span> <span>{{ invoice.date }}</span>
+        </div>
+    </div>
+
+    <div class="content-area">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Item Name</th>
+                    <th style="width: 35%;">Description</th>
+                    <th style="width: 15%;">Price</th>
+                    <th style="width: 10%;">Quantity</th>
+                    <th style="width: 15%; text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td><strong>{{ it.item_no }}</strong></td>
+                    <td>{{ it.description }}</td>
+                    <td>{{ it.rate }}</td>
+                    <td>{{ it.qty }}</td>
+                    <td style="text-align: right;">{{ it.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="summary-wrapper">
+        <div class="summary-box">
+            <div class="sum-row"><span>Subtotal:</span> <span>{{ totals.subtotal }}</span></div>
+            <div class="sum-row"><span>Tax ({{ totals.insurance }}%):</span> <span>{{ totals.other }}</span></div>
+            <div class="total-row"><span>Total:</span> <span>{{ totals.grand_total }}</span></div>
+        </div>
+    </div>
+
+    <div class="footer-grid">
+        <div class="footer-block">
+            <h4>Payment Methods:</h4>
+            <p><strong>Bank Name:</strong> {{ bank.bank_name }}</p>
+            <p><strong>Account Number:</strong> {{ bank.account_no }}</p>
+            <p><strong>SWIFT:</strong> {{ bank.swift }}</p>
+        </div>
+        <div class="footer-block">
+            <h4>Terms & Conditions:</h4>
+            <p>{{ totals.amount_in_words }}</p>
+            <p>Payment is due upon receipt of this invoice.</p>
+        </div>
+
+        <div class="footer-block">
+            <h4>Contact Info:</h4>
+            <p><strong>{{ company.name }}</strong></p>
+            <p>{{ company.address }}</p>
+            <p>Phone: {{ bank.branch }}</p>
+        </div>
+        <div class="footer-block">
+            <div class="signature-area">
+                Signature
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

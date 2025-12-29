@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    @page { size: A4; margin: 0; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+    
+    body { 
+        margin: 0; 
+        font-family: 'Helvetica', 'Arial', sans-serif; 
+        color: #333; 
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        min-height: 297mm;
+    }
+
+    /* Top Green Border */
+    .top-border {
+        background: #4a7c2c;
+        height: 12px;
+        width: 100%;
+    }
+
+    /* Header Section */
+    .header-container {
+        padding: 40px 50px 20px 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .title-area h1 {
+        font-size: 52px;
+        color: #2c516d; /* Muted blue from image */
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .balance-box {
+        background: #d4edda;
+        padding: 10px 20px;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+        width: 300px;
+        border-radius: 4px;
+    }
+
+    .balance-box span {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+
+    .company-info {
+        text-align: right;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    .company-name {
+        font-weight: bold;
+        font-size: 16px;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    /* Party/Meta Info */
+    .meta-container {
+        padding: 20px 50px 40px 50px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+    }
+
+    .info-group { line-height: 1.6; }
+    .info-group strong { display: block; margin-bottom: 5px; font-size: 15px; }
+
+    /* Table Styling */
+    .content { flex-grow: 1; padding: 0 50px; }
+    table { width: 100%; border-collapse: collapse; }
+    
+    thead th {
+        border-top: 2px solid #333;
+        border-bottom: 2px solid #333;
+        padding: 10px;
+        text-align: left;
+        font-size: 13px;
+    }
+
+    tbody td {
+        padding: 12px 10px;
+        font-size: 13px;
+    }
+
+    /* Green zebra stripes from image */
+    tbody tr:nth-child(even) { background: #e9f7ef; }
+    tbody tr:nth-child(odd) { background: #fff; }
+    tbody tr:last-child { border-bottom: 2px solid #333; }
+
+    /* Bottom Summary */
+    .bottom-section {
+        padding: 20px 50px 40px 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .note-area { width: 50%; font-size: 13px; }
+    .note-area strong { display: block; margin-bottom: 10px; }
+
+    .totals-area { width: 35%; }
+    .totals-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .totals-row.highlight {
+        background: #d4edda;
+        font-weight: bold;
+    }
+
+    /* Footer Section */
+    .footer {
+        padding: 20px 50px;
+        border-top: 8px solid #4a7c2c;
+        font-size: 13px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+    <div class="top-border"></div>
+
+    <div class="header-container">
+        <div class="title-area">
+            <h1>Proforma Invoice</h1>
+            <div class="balance-box">
+                <span>Balance Due</span>
+                <span>{{ totals.grand_total }}</span>
+            </div>
+        </div>
+        <div class="company-info">
+            <span class="company-name">{{ company.name }}</span>
+            {{ company.address }}
+        </div>
+    </div>
+
+    <div class="meta-container">
+        <div class="info-group">
+            <strong>Debit To:</strong>
+            {{ buyer.name }}<br>
+            {{ buyer.address }}<br>
+            Notify: {{ notify.name }}
+        </div>
+        <div class="info-group" style="text-align: left; min-width: 200px;">
+            <div><strong>Debit Date:</strong> {{ invoice.date }}</div>
+            <div><strong>Debit No.:</strong> {{ invoice.number }}</div>
+            <div><strong>Invoice No.:</strong> {{ invoice.number }}</div>
+        </div>
+    </div>
+
+    <div class="content">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 20%;">Item name</th>
+                    <th style="width: 40%;">Description</th>
+                    <th style="width: 10%;">Quantity</th>
+                    <th style="width: 10%;">Price</th>
+                    <th style="width: 15%; text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td>{{ it.sl_no }}</td>
+                    <td><strong>{{ it.item_no }}</strong></td>
+                    <td>{{ it.description }}</td>
+                    <td>{{ it.qty }} {{ it.unit }}</td>
+                    <td>{{ it.rate }}</td>
+                    <td style="text-align: right;">{{ it.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bottom-section">
+        <div class="note-area">
+            <strong>Note</strong>
+            <p>Banking Details: {{ bank.bank_name }} | A/C: {{ bank.account_no }}<br>
+            IBAN: {{ bank.iban }} | SWIFT: {{ bank.swift }}</p>
+            <p><em>{{ totals.amount_in_words }}</em></p>
+        </div>
+        <div class="totals-area">
+            <div class="totals-row">
+                <span>Subtotal</span>
+                <span>{{ totals.subtotal }}</span>
+            </div>
+            <div class="totals-row">
+                <span>Shipping</span>
+                <span>{{ totals.freight }}</span>
+            </div>
+            <div class="totals-row highlight">
+                <span>Total</span>
+                <span>{{ totals.grand_total }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Thank you for your business!
+    </div>
+
+</body>
+</html>

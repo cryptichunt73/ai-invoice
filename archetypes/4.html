@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    @page { size: A4; margin: 0; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+    
+    body { 
+        margin: 0; 
+        font-family: 'Helvetica', 'Arial', sans-serif; 
+        color: #333; 
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        min-height: 297mm;
+    }
+
+    /* Blue Header Section */
+    .header-banner {
+        background: #e1e7f5; /* Light blue background for title */
+        padding: 20px 40px;
+    }
+    
+    .header-banner h1 {
+        color: #3b5998; /* Darker blue text */
+        font-size: 48px;
+        margin: 0;
+        font-weight: bold;
+    }
+
+    .header-stripe {
+        background: #3b5998; /* Solid dark blue stripe */
+        height: 35px;
+        width: 100%;
+    }
+
+    /* Address and Meta Grid */
+    .meta-section {
+        padding: 30px 40px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .address-group strong {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 5px;
+        border-bottom: 1px solid #ccc; /* Thin separator lines as seen in */
+        width: fit-content;
+        padding-right: 50px;
+    }
+
+    .meta-details {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        row-gap: 5px;
+    }
+
+    .meta-label { font-weight: bold; }
+
+    /* Table Styling */
+    .content { padding: 0 40px; flex-grow: 1; }
+    
+    table { width: 100%; border-collapse: collapse; }
+    
+    thead th {
+        color: #3b5998;
+        text-align: left;
+        padding: 10px;
+        border-bottom: 2px solid #3b5998; /* Blue accent border */
+        font-size: 14px;
+    }
+
+    tbody td {
+        padding: 12px 10px;
+        font-size: 13px;
+        border-bottom: 1px solid #e1e7f5;
+    }
+
+    /* Light blue zebra stripes for rows */
+    tbody tr:nth-child(even) { background: #f0f4ff; }
+
+    /* Financial Summary */
+    .summary-container {
+        padding: 20px 40px 40px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .summary-table {
+        width: 300px;
+        font-size: 13px;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 10px;
+        background: #f0f4ff;
+        margin-bottom: 2px;
+    }
+
+    .summary-row.total {
+        background: #e1e7f5;
+        border-top: 2px solid #3b5998;
+        border-bottom: 2px solid #3b5998;
+        font-weight: bold;
+        font-size: 15px;
+        margin-top: 5px;
+    }
+
+    /* Bottom Section */
+    .note-section { padding: 0 40px 20px 40px; font-size: 13px; }
+    .note-section strong { display: block; margin-bottom: 5px; }
+
+    .bottom-stripe {
+        background: #3b5998;
+        height: 25px;
+        width: 100%;
+        margin-top: auto;
+    }
+</style>
+</head>
+<body>
+
+    <header class="header-banner">
+        <h1>Proforma Invoice</h1>
+    </header>
+    <div class="header-stripe"></div>
+
+    <section class="meta-section">
+        <div class="address-group">
+            <strong>From Address:</strong>
+            {{ company.name }}<br>
+            {{ company.address }}<br>
+            Phone: {{ bank.branch }} </div>
+        <div class="meta-details">
+            <span class="meta-label">Credit Date:</span> <span>{{ invoice.date }}</span>
+            <span class="meta-label">Credit No:</span> <span>{{ invoice.number }}</span>
+            <span class="meta-label">Customer ID:</span> <span>{{ buyer.name }}</span>
+            <span class="meta-label">Invoice No:</span> <span>{{ invoice.number }}</span>
+        </div>
+
+        <div class="address-group">
+            <strong>Billing Address:</strong>
+            {{ buyer.name }}<br>
+            {{ buyer.address }}
+        </div>
+        <div></div>
+    </section>
+
+    <main class="content">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50%;">Description</th>
+                    <th style="width: 10%; text-align: center;">Quantity</th>
+                    <th style="width: 20%; text-align: center;">Unit Price</th>
+                    <th style="width: 20%; text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td>{{ it.description }} ({{ it.item_no }})</td>
+                    <td style="text-align: center;">{{ it.qty }}</td>
+                    <td style="text-align: center;">{{ it.rate }}</td>
+                    <td style="text-align: right;">{{ it.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+
+    <section class="summary-container">
+        <div class="summary-table">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>{{ totals.subtotal }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax Rate</span>
+                <span>{{ totals.insurance }}%</span> </div>
+            <div class="summary-row">
+                <span>Tax</span>
+                <span>{{ totals.other }}</span> </div>
+            <div class="summary-row total">
+                <span>Total</span>
+                <span>{{ totals.grand_total }}</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="note-section">
+        <strong>Note:</strong>
+        <p>{{ totals.amount_in_words }}</p>
+        <p>Banking: {{ bank.bank_name }} | Account: {{ bank.account_no }}</p>
+    </section>
+
+    <div class="bottom-stripe"></div>
+
+</body>
+</html>

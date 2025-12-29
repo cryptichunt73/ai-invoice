@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page { size: A4; margin: 0; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+    
+    body { 
+        margin: 0; 
+        padding: 60px 50px;
+        font-family: 'Garamond', 'Georgia', serif; 
+        color: #444; 
+        background: #fff;
+    }
+
+    /* Top Branding Section */
+    .brand-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 60px;
+    }
+
+    .doc-title {
+        color: #b38b2d; /* Elegant Gold */
+        font-size: 56px;
+        font-weight: 300;
+        text-transform: uppercase;
+        margin: 0;
+        line-height: 1;
+    }
+
+    .doc-number {
+        color: #b38b2d;
+        font-size: 20px;
+        margin-top: 10px;
+        text-align: right;
+    }
+
+    /* Address Grid */
+    .address-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 100px;
+        margin-bottom: 50px;
+        font-size: 14px;
+    }
+
+    .label {
+        font-weight: bold;
+        color: #b38b2d;
+        margin-bottom: 8px;
+        display: block;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    /* Table Styling */
+    .item-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 40px;
+        background: yellow;
+    }
+
+    .item-table thead th {
+        text-align: left;
+        padding: 15px 5px;
+        border-bottom: 1px solid #b38b2d;
+        color: #b38b2d;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    .item-table tbody td {
+        padding: 20px 5px;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+    }
+
+    /* Summary & Notes */
+    .bottom-container {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 50px;
+    }
+
+    .total-box {
+        text-align: right;
+        font-size: 16px;
+    }
+
+    .total-row {
+        padding: 10px 0;
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #f9f9f9;
+    }
+
+    .grand-total {
+        color: #b38b2d;
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 10px;
+        border-top: 2px solid #b38b2d;
+        padding-top: 10px;
+    }
+
+    .notes-box {
+        font-size: 12px;
+        line-height: 1.6;
+        color: #777;
+    }
+
+    /* Minimalist Footer */
+    .footer {
+        position: fixed;
+        bottom: 40px;
+        left: 50px;
+        right: 50px;
+        text-align: center;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+        font-size: 11px;
+        color: #aaa;
+    }
+</style>
+</head>
+<body>
+
+    <header class="brand-header">
+        <div>
+            <h1 class="doc-title">{{ invoice.title }}</h1>
+            <p style="margin: 5px 0;">{{ category }}</p>
+        </div>
+        <div class="doc-number">
+            #{{ invoice.number }}<br>
+            <span style="color: #444; font-size: 14px;">Date Issued: {{ invoice.date }}</span>
+        </div>
+    </header>
+
+    <div class="address-row">
+        <div>
+            <span class="label">Bill To</span>
+            <strong style="font-size: 18px;">{{ buyer.name }}</strong><br>
+            {{ buyer.address }}
+        </div>
+        <div style="text-align: right;">
+            <span class="label">Issued By</span>
+            <strong>{{ company.name }}</strong><br>
+            {{ company.address }}
+        </div>
+    </div>
+
+    <table class="item-table">
+        <thead>
+            <tr>
+                <th style="width: 50%;">Description</th>
+                <th style="width: 10%;">Qty</th>
+                <th style="width: 20%; text-align: right;">Price</th>
+                <th style="width: 20%; text-align: right;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for it in items %}
+            <tr>
+                <td>
+                    <strong>{{ it.item_no }}</strong><br>
+                    <span style="font-size: 12px; color: #888;">{{ it.description }}</span>
+                </td>
+                <td>{{ it.qty }} {{ it.unit }}</td>
+                <td style="text-align: right;">{{ it.rate }}</td>
+                <td style="text-align: right;">{{ it.amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="bottom-container">
+        <div class="notes-box">
+            <span class="label">Note & Payment Details</span>
+            <p><strong>Bank:</strong> {{ bank.bank_name }} | <strong>Acc:</strong> {{ bank.account_no }}</p>
+            <p><strong>SWIFT:</strong> {{ bank.swift }} | <strong>IBAN:</strong> {{ bank.iban }}</p>
+            <p style="font-style: italic;">Amount in Words: {{ totals.amount_in_words }}</p>
+        </div>
+        
+        <div class="total-box">
+            <div class="total-row">
+                <span>Subtotal</span>
+                <span>{{ totals.subtotal }}</span>
+            </div>
+            <div class="total-row">
+                <span>Freight / Shipping</span>
+                <span>{{ totals.freight }}</span>
+            </div>
+            <div class="total-row">
+                <span>Tax / Insurance</span>
+                <span>{{ totals.insurance }}</span>
+            </div>
+            <div class="grand-total">
+                <span>Total</span>
+                <span>{{ totals.grand_total }}</span>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        Thank you for your business!<br>
+        {{ company.name }} | {{ company.address }}
+    </footer>
+
+</body>
+</html>
