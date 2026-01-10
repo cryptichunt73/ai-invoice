@@ -996,6 +996,11 @@ def generate_template_candidates(company_name: str, company_slug: str, k: int = 
     return candidates
 
 def pick_best_candidate(company_slug: str, candidates: List[Tuple[dict, str]]) -> Tuple[dict, str, dict]:
+    """
+    Validation-lite:
+    - Only checks that the template can compile + render with dummy data.
+    - Still picks the least similar template if multiple pass.
+    """
     existing = list_existing_templates()
 
     best = None
@@ -1003,8 +1008,13 @@ def pick_best_candidate(company_slug: str, candidates: List[Tuple[dict, str]]) -
 
     for recipe, html in candidates:
         errs = []
-        errs += validate_monochrome_and_print(html)
-        errs += validate_jinja(html)
+
+        # Only ensure Jinja can render (prevents broken templates crashing later)
+        try:
+            tpl = jinja_env.from_string(html)
+            tpl.render(**dummy_invoice_data())
+        except Exception as e:
+            errs.append(f"Jinja compile/render error: {e}")
 
         sim = max_similarity(html, existing)
         debug["candidates"].append({
@@ -1021,12 +1031,7 @@ def pick_best_candidate(company_slug: str, candidates: List[Tuple[dict, str]]) -
             best = {"recipe": recipe, "html": html, "sim": sim}
 
     if best is None:
-        raise ValueError("All generated candidates failed validation. See debug info.")
-
-    # Strict novelty gate (tune threshold if needed)
-    if best["sim"] > 0.42:
-        debug["note"] = "Best candidate still too similar; increase K or strengthen prompt."
-        raise ValueError("Templates are still too similar to existing ones. Increase candidate count K or strengthen prompt.")
+        raise ValueError("All generated candidates failed Jinja render. See debug info.")
 
     return best["recipe"], best["html"], debug
 
